@@ -128,4 +128,27 @@ describe('Bot', function () {
     });
   });
 
+  describe('Add an entry', function () {
+
+    it('should return an error when entry is empty', function () {
+      var ector = new Ector();
+      var nodes = ector.addEntry("");
+      assert.equal(nodes instanceof Error, true);
+    });
+
+    it('should return an error when entry is not a string', function () {
+      var ector = new Ector();
+      var nodes = ector.addEntry();
+      assert.equal(nodes instanceof Error, true);
+    });
+
+    it('should return an array of one node', function () {
+      var ector = new Ector();
+      var nodes = ector.addEntry("Hello.");
+      assert.equal(nodes instanceof Error, false);
+      assert.equal(nodes.length, 1);
+      assert.equal(nodes[0], "Hello.");
+    });
+
+  });
 });
