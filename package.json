@@ -28,7 +28,8 @@
     "test": "make test"
   },
   "dependencies": {
-    "debug": "0.7.x"
+    "debug": "0.7.x",
+    "sentence-tokenizer": "*"
   },
   "devDependencies": {
     "mocha": "1.7.x",

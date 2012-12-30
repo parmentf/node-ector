@@ -150,5 +150,14 @@ describe('Bot', function () {
       assert.equal(nodes[0], "Hello.");
     });
 
+    it('should return an array of two nodes', function () {
+      var ector = new Ector();
+      var nodes = ector.addEntry("Hello world.");
+      assert.equal(nodes instanceof Error, false);
+      assert.equal(nodes.length, 2);
+      assert.equal(nodes[0], "Hello");
+      assert.equal(nodes[1], "world.");
+    });
+
   });
 });
