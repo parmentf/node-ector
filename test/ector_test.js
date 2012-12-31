@@ -147,7 +147,7 @@ describe('Bot', function () {
       var nodes = ector.addEntry("Hello.");
       assert.equal(nodes instanceof Error, false);
       assert.equal(nodes.length, 1);
-      assert.equal(nodes[0], "Hello.");
+      assert.equal(nodes[0].label, "Hello.");
     });
 
     it('should return an array of two nodes', function () {
@@ -155,8 +155,8 @@ describe('Bot', function () {
       var nodes = ector.addEntry("Hello world.");
       assert.equal(nodes instanceof Error, false);
       assert.equal(nodes.length, 2);
-      assert.equal(nodes[0], "Hello");
-      assert.equal(nodes[1], "world.");
+      assert.equal(nodes[0].label, "Hello");
+      assert.equal(nodes[1].label, "world.");
     });
 
     it('should add the nodes in the concept network', function () {
@@ -166,6 +166,12 @@ describe('Bot', function () {
       var nodes = ector.addEntry("Hello world.");
       assert.equal(Object.getOwnPropertyNames(cn.node).length, 3);
     });
-    
+
+    it('should add positions in the sentence', function () {
+      var ector = new Ector();
+      var cn = ector.cn;
+      var nodes = ector.addEntry("Salut tout le monde.");
+
+    })
   });
 });
