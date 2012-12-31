@@ -175,5 +175,16 @@ describe('Bot', function () {
       assert.equal(nodes[2].mid, 1);
       assert.equal(nodes[3].end, 1);
     });
+
+    it('should increment positions in the sentence', function () {
+      var ector = new Ector();
+      var cn = ector.cn;
+      var nodes = ector.addEntry("Salut tout le monde.");
+      var nodes2 = ector.addEntry("Salut le peuple du monde.");
+      assert.equal(nodes2[0].beg, 2);
+      assert.equal(nodes2[1].mid, 2);
+      assert.equal(nodes2[2].mid, 1);
+      assert.equal(nodes2[4].end, 2);
+    });
   });
 });
