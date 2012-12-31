@@ -159,5 +159,13 @@ describe('Bot', function () {
       assert.equal(nodes[1], "world.");
     });
 
+    it('should add the nodes in the concept network', function () {
+      var ector = new Ector();
+      var cn = ector.cn;
+      assert.notEqual(cn, null);
+      var nodes = ector.addEntry("Hello world.");
+      assert.equal(Object.getOwnPropertyNames(cn.node).length, 3);
+    });
+    
   });
 });

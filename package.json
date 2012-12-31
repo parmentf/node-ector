@@ -29,7 +29,8 @@
   },
   "dependencies": {
     "debug": "0.7.x",
-    "sentence-tokenizer": "*"
+    "sentence-tokenizer": "*",
+    "concept-network": "*"
   },
   "devDependencies": {
     "mocha": "1.7.x",

@@ -9,6 +9,7 @@ Install the module with: `npm install ector`
 ```javascript
 var Ector = require('ector');
 var ector = new Ector();
+ector.addEntry("Hello ECTOR!");
 ```
 
 ## Documentation
