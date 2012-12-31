@@ -171,7 +171,9 @@ describe('Bot', function () {
       var ector = new Ector();
       var cn = ector.cn;
       var nodes = ector.addEntry("Salut tout le monde.");
-
-    })
+      assert.equal(nodes[0].beg, 1);
+      assert.equal(nodes[2].mid, 1);
+      assert.equal(nodes[3].end, 1);
+    });
   });
 });
