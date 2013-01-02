@@ -186,5 +186,33 @@ describe('Bot', function () {
       assert.equal(nodes2[2].mid, 1);
       assert.equal(nodes2[4].end, 2);
     });
+
+    it('should add links between following tokens', function () {
+      var ector = new Ector();
+      var cn = ector.cn;
+      var nodes = ector.addEntry("Salut tout le monde.");
+      assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 1 });
+      assert.deepEqual(cn.link['3_4'], { fromId: 3, toId: 4, coOcc: 1 });
+      assert.deepEqual(cn.link['4_5'], { fromId: 4, toId: 5, coOcc: 1 });
+    });
+
+    it('should add links between sentence and its tokens', function () {
+      var ector = new Ector();
+      var cn = ector.cn;
+      var nodes = ector.addEntry("Salut tout le monde.");
+      assert.deepEqual(cn.link['1_2'], { fromId: 1, toId: 2, coOcc: 1 });
+      assert.deepEqual(cn.link['1_3'], { fromId: 1, toId: 3, coOcc: 1 });
+      assert.deepEqual(cn.link['1_4'], { fromId: 1, toId: 4, coOcc: 1 });
+      assert.deepEqual(cn.link['1_5'], { fromId: 1, toId: 5, coOcc: 1 });
+    });
+
+    it('should increment links between following tokens', function () {
+      var ector = new Ector();
+      var cn = ector.cn;
+      var nodes = ector.addEntry("Salut tout le monde.");
+      assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 1 });
+      var nodes2 = ector.addEntry("Salut tout le peuple.");
+      assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 2 });
+    });
   });
 });
