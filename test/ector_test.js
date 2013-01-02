@@ -206,6 +206,13 @@ describe('Bot', function () {
       assert.deepEqual(cn.link['1_5'], { fromId: 1, toId: 5, coOcc: 1 });
     });
 
+    it('should add links between following sentences', function () {
+      var ector = new Ector();
+      var cn = ector.cn;
+      var nodes = ector.addEntry("Ah! Oh.");
+      assert.deepEqual(cn.link['1_3'], { fromId: 1, toId: 3, coOcc: 1 });
+    });
+
     it('should increment links between following tokens', function () {
       var ector = new Ector();
       var cn = ector.cn;
@@ -214,5 +221,16 @@ describe('Bot', function () {
       var nodes2 = ector.addEntry("Salut tout le peuple.");
       assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 2 });
     });
+  });
+
+  describe('Response', function () {
+
+    it('should generate a response', function () {
+      var ector = new Ector("ECTOR", "Guy");
+      var nodes = ector.addEntry("Hello ECTOR.");
+      var response = ector.generateResponse();
+      assert.deepEqual(response, { sentence: "Hello Guy.", nodes: [2, 3] });
+    });
+
   });
 });
