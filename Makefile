@@ -5,6 +5,9 @@ JSON_FILES = $(wildcard $(APP_DIR)/config/*.json) $(wildcard $(APP_DIR)/*.json)
 test:
 	@NODE_ENV=test ./node_modules/.bin/mocha
 
+test-s:
+	@NODE_ENV=test ./node_modules/.bin/mocha --reporter spec
+
 test-w:
 	@NODE_ENV=test ./node_modules/.bin/mocha \
 	  --growl \
