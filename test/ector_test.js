@@ -1,5 +1,5 @@
-/*jshint node:true curly: true, eqeqeq: true, immed: true, latedef: true, newcap: true, noarg: true, sub: true, undef: true, eqnull: true, laxcomma: true, white: true, indent: 2 */
-/*global describe: true, it: true */
+/*jshint node:true curly:true, eqeqeq:true, immed:true, latedef:true, newcap:true, noarg:true, sub:true, undef:true, eqnull:true, laxcomma:true, white:true, indent:2 */
+/*global describe:true, it:true, before:true */
 "use strict";
 
 // # Tests for ECTOR module
@@ -7,6 +7,7 @@
 // ## Required libraries
 var debug = require('debug')('ector:test');
 var assert = require('assert'); // Maybe one day "should"?
+var ConceptNetworkState = require('concept-network').ConceptNetworkState;
 
 // ## Module to test
 var Ector = require('../lib/ector.js');
@@ -130,97 +131,122 @@ describe('Bot', function () {
 
   describe('Add an entry', function () {
 
-    it('should return an error when entry is empty', function () {
-      var ector = new Ector();
-      var nodes = ector.addEntry("");
-      assert.equal(nodes instanceof Error, true);
+    describe('in the Concept Network', function () {
+
+      it('should return an error when entry is empty', function () {
+        var ector = new Ector();
+        var nodes = ector.addEntry("");
+        assert.equal(nodes instanceof Error, true);
+      });
+
+      it('should return an error when entry is not a string', function () {
+        var ector = new Ector();
+        var nodes = ector.addEntry();
+        assert.equal(nodes instanceof Error, true);
+      });
+
+      it('should return an array of one node', function () {
+        var ector = new Ector();
+        var nodes = ector.addEntry("Hello.");
+        assert.equal(nodes instanceof Error, false);
+        assert.equal(nodes.length, 1);
+        assert.equal(nodes[0].label, "Hello.");
+      });
+
+      it('should return an array of two nodes', function () {
+        var ector = new Ector();
+        var nodes = ector.addEntry("Hello world.");
+        assert.equal(nodes instanceof Error, false);
+        assert.equal(nodes.length, 2);
+        assert.equal(nodes[0].label, "Hello");
+        assert.equal(nodes[1].label, "world.");
+      });
+
+      it('should add the nodes in the concept network', function () {
+        var ector = new Ector();
+        var cn = ector.cn;
+        assert.notEqual(cn, null);
+        var nodes = ector.addEntry("Hello world.");
+        assert.equal(Object.getOwnPropertyNames(cn.node).length, 3);
+      });
+
+      it('should add positions in the sentence', function () {
+        var ector = new Ector();
+        var cn = ector.cn;
+        var nodes = ector.addEntry("Salut tout le monde.");
+        assert.equal(nodes[0].beg, 1);
+        assert.equal(nodes[2].mid, 1);
+        assert.equal(nodes[3].end, 1);
+      });
+
+      it('should increment positions in the sentence', function () {
+        var ector = new Ector();
+        var cn = ector.cn;
+        var nodes = ector.addEntry("Salut tout le monde.");
+        var nodes2 = ector.addEntry("Salut le peuple du monde.");
+        assert.equal(nodes2[0].beg, 2);
+        assert.equal(nodes2[1].mid, 2);
+        assert.equal(nodes2[2].mid, 1);
+        assert.equal(nodes2[4].end, 2);
+      });
+
+      it('should add links between following tokens', function () {
+        var ector = new Ector();
+        var cn = ector.cn;
+        var nodes = ector.addEntry("Salut tout le monde.");
+        assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 1 });
+        assert.deepEqual(cn.link['3_4'], { fromId: 3, toId: 4, coOcc: 1 });
+        assert.deepEqual(cn.link['4_5'], { fromId: 4, toId: 5, coOcc: 1 });
+      });
+
+      it('should add links between sentence and its tokens', function () {
+        var ector = new Ector();
+        var cn = ector.cn;
+        var nodes = ector.addEntry("Salut tout le monde.");
+        assert.deepEqual(cn.link['1_2'], { fromId: 1, toId: 2, coOcc: 1 });
+        assert.deepEqual(cn.link['1_3'], { fromId: 1, toId: 3, coOcc: 1 });
+        assert.deepEqual(cn.link['1_4'], { fromId: 1, toId: 4, coOcc: 1 });
+        assert.deepEqual(cn.link['1_5'], { fromId: 1, toId: 5, coOcc: 1 });
+      });
+
+      it('should add links between following sentences', function () {
+        var ector = new Ector();
+        var cn = ector.cn;
+        var nodes = ector.addEntry("Ah! Oh.");
+        assert.deepEqual(cn.link['1_3'], { fromId: 1, toId: 3, coOcc: 1 });
+      });
+
+      it('should increment links between following tokens', function () {
+        var ector = new Ector();
+        var cn = ector.cn;
+        var nodes = ector.addEntry("Salut tout le monde.");
+        assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 1 });
+        var nodes2 = ector.addEntry("Salut tout le peuple.");
+        assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 2 });
+      });
+
     });
 
-    it('should return an error when entry is not a string', function () {
-      var ector = new Ector();
-      var nodes = ector.addEntry();
-      assert.equal(nodes instanceof Error, true);
+    describe('in the ConceptNetworkState', function () {
+
+      var ector, cn, cns, nodes, node2;
+      
+      before(function () {
+        ector = new Ector();
+        cn = ector.cn;
+        cns = new ConceptNetworkState(cn);
+        ector.addEntry("Sentence.");
+      });
+
+      it('should activate the sentence node', function () {
+        assert.equal(cns.getActivationValue(1), 100);
+      });
+
+      it('should activate the token node', function () {
+        assert.equal(cns.getActivationValue(2), 100);
+      });
     });
 
-    it('should return an array of one node', function () {
-      var ector = new Ector();
-      var nodes = ector.addEntry("Hello.");
-      assert.equal(nodes instanceof Error, false);
-      assert.equal(nodes.length, 1);
-      assert.equal(nodes[0].label, "Hello.");
-    });
-
-    it('should return an array of two nodes', function () {
-      var ector = new Ector();
-      var nodes = ector.addEntry("Hello world.");
-      assert.equal(nodes instanceof Error, false);
-      assert.equal(nodes.length, 2);
-      assert.equal(nodes[0].label, "Hello");
-      assert.equal(nodes[1].label, "world.");
-    });
-
-    it('should add the nodes in the concept network', function () {
-      var ector = new Ector();
-      var cn = ector.cn;
-      assert.notEqual(cn, null);
-      var nodes = ector.addEntry("Hello world.");
-      assert.equal(Object.getOwnPropertyNames(cn.node).length, 3);
-    });
-
-    it('should add positions in the sentence', function () {
-      var ector = new Ector();
-      var cn = ector.cn;
-      var nodes = ector.addEntry("Salut tout le monde.");
-      assert.equal(nodes[0].beg, 1);
-      assert.equal(nodes[2].mid, 1);
-      assert.equal(nodes[3].end, 1);
-    });
-
-    it('should increment positions in the sentence', function () {
-      var ector = new Ector();
-      var cn = ector.cn;
-      var nodes = ector.addEntry("Salut tout le monde.");
-      var nodes2 = ector.addEntry("Salut le peuple du monde.");
-      assert.equal(nodes2[0].beg, 2);
-      assert.equal(nodes2[1].mid, 2);
-      assert.equal(nodes2[2].mid, 1);
-      assert.equal(nodes2[4].end, 2);
-    });
-
-    it('should add links between following tokens', function () {
-      var ector = new Ector();
-      var cn = ector.cn;
-      var nodes = ector.addEntry("Salut tout le monde.");
-      assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 1 });
-      assert.deepEqual(cn.link['3_4'], { fromId: 3, toId: 4, coOcc: 1 });
-      assert.deepEqual(cn.link['4_5'], { fromId: 4, toId: 5, coOcc: 1 });
-    });
-
-    it('should add links between sentence and its tokens', function () {
-      var ector = new Ector();
-      var cn = ector.cn;
-      var nodes = ector.addEntry("Salut tout le monde.");
-      assert.deepEqual(cn.link['1_2'], { fromId: 1, toId: 2, coOcc: 1 });
-      assert.deepEqual(cn.link['1_3'], { fromId: 1, toId: 3, coOcc: 1 });
-      assert.deepEqual(cn.link['1_4'], { fromId: 1, toId: 4, coOcc: 1 });
-      assert.deepEqual(cn.link['1_5'], { fromId: 1, toId: 5, coOcc: 1 });
-    });
-
-    it('should add links between following sentences', function () {
-      var ector = new Ector();
-      var cn = ector.cn;
-      var nodes = ector.addEntry("Ah! Oh.");
-      assert.deepEqual(cn.link['1_3'], { fromId: 1, toId: 3, coOcc: 1 });
-    });
-
-    it('should increment links between following tokens', function () {
-      var ector = new Ector();
-      var cn = ector.cn;
-      var nodes = ector.addEntry("Salut tout le monde.");
-      assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 1 });
-      var nodes2 = ector.addEntry("Salut tout le peuple.");
-      assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 2 });
-    });
   });
 
   describe('Response', function () {
