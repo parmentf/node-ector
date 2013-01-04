@@ -66,6 +66,21 @@ describe('Instanciations', function () {
       });
     });
 
+    describe('ConceptNetworkState', function () {
+
+      it('should add one, for the default username', function () {
+        var ector = new Ector(null, "Guy");
+        assert.equal(typeof ector.cns["Guy"], "object");
+      });
+
+      it('should add one, for an unknown username', function () {
+        var ector = new Ector(null, "Guy");
+        ector.setUser('Chuck');
+        assert.equal(typeof ector.cns["Chuck"], "object");
+      });
+
+    });
+
   });
 });
 
@@ -235,7 +250,7 @@ describe('Bot', function () {
         ector = new Ector();
         cn = ector.cn;
         cns = new ConceptNetworkState(cn);
-        ector.addEntry("Sentence.");
+        ector.addEntry("Sentence one.", cns);
       });
 
       it('should activate the sentence node', function () {
@@ -244,6 +259,7 @@ describe('Bot', function () {
 
       it('should activate the token node', function () {
         assert.equal(cns.getActivationValue(2), 100);
+        assert.equal(cns.getActivationValue(3), 100);
       });
     });
 
