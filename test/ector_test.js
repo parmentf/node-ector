@@ -160,21 +160,27 @@ describe('Bot', function () {
         assert.equal(nodes instanceof Error, true);
       });
 
-      it('should return an array of one node', function () {
+      it('should create a sentence node', function () {
+        var ector = new Ector();
+        ector.addEntry("Hello.");
+        assert.equal(ector.cn.node[1].label, "sHello.");
+      });
+
+      it('should return an array of one word node', function () {
         var ector = new Ector();
         var nodes = ector.addEntry("Hello.");
         assert.equal(nodes instanceof Error, false);
         assert.equal(nodes.length, 1);
-        assert.equal(nodes[0].label, "Hello.");
+        assert.equal(nodes[0].label, "wHello.");
       });
 
-      it('should return an array of two nodes', function () {
+      it('should return an array of two word nodes', function () {
         var ector = new Ector();
         var nodes = ector.addEntry("Hello world.");
         assert.equal(nodes instanceof Error, false);
         assert.equal(nodes.length, 2);
-        assert.equal(nodes[0].label, "Hello");
-        assert.equal(nodes[1].label, "world.");
+        assert.equal(nodes[0].label, "wHello");
+        assert.equal(nodes[1].label, "wworld.");
       });
 
       it('should add the nodes in the concept network', function () {
@@ -253,14 +259,39 @@ describe('Bot', function () {
         ector.addEntry("Sentence one.", cns);
       });
 
-      it('should activate the sentence node', function () {
-        assert.equal(cns.getActivationValue(1), 100);
+      describe('with a two-tokens sentence', function () {
+
+        before(function () {
+          ector.addEntry("Sentence one.", cns);
+        });
+
+        it('should activate the sentence node', function () {
+          assert.equal(cns.getActivationValue(1), 100);
+        });
+
+        it('should activate the token node', function () {
+          assert.equal(cns.getActivationValue(2), 100);
+          assert.equal(cns.getActivationValue(3), 100);
+        });
+
       });
 
-      it('should activate the token node', function () {
-        assert.equal(cns.getActivationValue(2), 100);
-        assert.equal(cns.getActivationValue(3), 100);
+      describe('with a one-token sentence', function () {
+
+        before(function () {
+          ector.addEntry("Sentence.", cns);
+        });
+
+        it('should activate the sentence node', function () {
+          assert.equal(cns.getActivationValue(4), 100);
+        });
+
+        it('should activate the token node', function () {
+          assert.equal(cns.getActivationValue(5), 100);
+        });
+
       });
+
     });
 
   });
