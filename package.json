@@ -1,23 +1,23 @@
 {
   "name": "ector",
-  "description": "ECTOR is a learning chatterbot. This is its Node.js version.",
-  "version": "0.1.0",
-  "homepage": "https://github.com/francois/node-ector",
+  "description": "ECTOR is a learning chatterbot.",
+  "version": "0.1.1",
+  "homepage": "https://github.com/parmentf/node-ector",
   "author": {
     "name": "François Parmentier",
     "email": "francois.parmentier@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/francois/node-ector.git"
+    "url": "git://github.com/parmentf/node-ector.git"
   },
   "bugs": {
-    "url": "https://github.com/francois/node-ector/issues"
+    "url": "https://github.com/parmentf/node-ector/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/francois/node-ector/blob/master/LICENSE-MIT"
+      "url": "https://github.com/parmentf/node-ector/blob/master/LICENSE-MIT"
     }
   ],
   "main": "lib/ector",
