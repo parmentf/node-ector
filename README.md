@@ -10,6 +10,8 @@ Install the module with: `npm install ector`
 var Ector = require('ector');
 var ector = new Ector();
 ector.addEntry("Hello ECTOR!");
+var response = ector.generateResponse();
+console.log(response.sentence);
 ```
 
 ## Documentation
@@ -22,7 +24,9 @@ _(Coming soon)_
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [mocha](http://visionmedia.github.com/mocha/).
 
 ## Release History
-_(Nothing yet)_
+
+* 2013/01/05: version 0.1.0: first release
+
 Warning: this is a work in progress.
 
 ## License

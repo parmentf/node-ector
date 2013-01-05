@@ -298,7 +298,8 @@ describe('Bot', function () {
 
   describe('Response', function () {
 
-    it('should generate a response', function () {
+    // First time, only the same sentence is returned.
+    it('should generate a response similar to the stimulus', function () {
       var ector = new Ector("ECTOR", "Guy");
       var nodes = ector.addEntry("Hello ECTOR.");
       var response = ector.generateResponse();
@@ -306,4 +307,5 @@ describe('Bot', function () {
     });
 
   });
+
 });
