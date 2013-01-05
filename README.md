@@ -25,6 +25,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+* 2013/01/05: version 0.1.1: fix github URL (to install)
 * 2013/01/05: version 0.1.0: first release
 
 Warning: this is a work in progress.
