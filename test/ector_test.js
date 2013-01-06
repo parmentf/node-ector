@@ -308,4 +308,15 @@ describe('Bot', function () {
 
   });
 
+  describe('PreviousSentenceNodeId', function () {
+
+    it('should store the last sentence node id', function () {
+      var ector = new Ector("ECTOR", "Guy");
+      assert.equal(ector.previousSentenceNodeId, null);
+      var nodes = ector.addEntry("Hello ECTOR.");
+      assert.equal(ector.previousSentenceNodeId, 1);
+    });
+
+  });
+
 });
