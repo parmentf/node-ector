@@ -115,6 +115,13 @@ describe('Users', function () {
       assert.equal(userId instanceof Error, true);
     });
 
+    it('should reset the lastSentenceNodeId', function () {
+      var ector = new Ector();
+      ector.lastSentenceNodeId = 1;
+      var userId = ector.setUser("Ali");
+      assert.equal(ector.lastSentenceNodeId, null);
+    });
+
     // it('should not be change using property username', function () {
     //   var ector = new Ector();
     //   assert.equal(ector.username, "Guy");
@@ -312,11 +319,24 @@ describe('Bot', function () {
 
     it('should store the last sentence node id', function () {
       var ector = new Ector("ECTOR", "Guy");
-      assert.equal(ector.previousSentenceNodeId, null);
+      assert.equal(ector.lastSentenceNodeId, null);
       var nodes = ector.addEntry("Hello ECTOR.");
-      assert.equal(ector.previousSentenceNodeId, 1);
+      assert.equal(ector.lastSentenceNodeId, 1);
     });
 
+    describe('link nodes to lastSentenceNode', function () {
+
+      it('should create links', function () {
+        var ector = new Ector("ECTOR", "Guy");
+        var nodes = ector.addEntry("Hello.");
+        // 1 link from sentenceNode to the only tokenNode
+        // sHello. -> wHello.
+        assert.equal(typeof ector.cn.link['2_1'], "undefined");
+        ector.linkNodesToLastSentence(nodes);
+        assert.equal(typeof ector.cn.link['2_1'], "object");
+      });
+
+    });
   });
 
 });
