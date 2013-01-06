@@ -326,13 +326,35 @@ describe('Bot', function () {
 
     describe('link nodes to lastSentenceNode', function () {
 
+      it('should not create links when no lastSentenceNode exist', function () {
+        var ector = new Ector("ECTOR", "Guy");
+        var nodes = ector.addEntry("Hello.");
+        ector.lastSentenceNodeId = null;
+        ector.linkNodesToLastSentence([2]);
+        assert.equal(typeof ector.cn.link['2_'], 'undefined');
+      });
+
+      it('should not create link when null is given', function () {
+        var ector = new Ector("ECTOR", "Guy");
+        var nodes = ector.addEntry("Hello.");
+        ector.linkNodesToLastSentence(null);
+        assert.equal(typeof ector.cn.link['2_'], 'undefined');
+      });
+
+      it('should not create link when [] is given', function () {
+        var ector = new Ector("ECTOR", "Guy");
+        var nodes = ector.addEntry("Hello.");
+        ector.linkNodesToLastSentence([]);
+        assert.equal(typeof ector.cn.link['2_'], 'undefined');
+      });
+
       it('should create links', function () {
         var ector = new Ector("ECTOR", "Guy");
         var nodes = ector.addEntry("Hello.");
         // 1 link from sentenceNode to the only tokenNode
-        // sHello. -> wHello.
+        // sHello. (1) -> wHello. (2)
         assert.equal(typeof ector.cn.link['2_1'], "undefined");
-        ector.linkNodesToLastSentence(nodes);
+        ector.linkNodesToLastSentence([2]);
         assert.equal(typeof ector.cn.link['2_1'], "object");
       });
 
