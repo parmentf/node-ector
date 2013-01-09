@@ -18,13 +18,16 @@ console.log(response.sentence);
 _(Coming soon)_
 
 ## Examples
-_(Coming soon)_
+The [browser-ector](https://github.com/parmentf/browser-ector) is an example of how this library can be used.
+
+You can talk to ECTOR in the browser. [Take a chat.](http://parmentf.github.com/browser-ector/ector.html).
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [mocha](http://visionmedia.github.com/mocha/).
 
 ## Release History
 
+* 2013/01/06: version 0.1.2: add linkNodesToLastSentence()
 * 2013/01/05: version 0.1.1: fix github URL (to install)
 * 2013/01/05: version 0.1.0: first release
 
