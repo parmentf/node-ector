@@ -7,6 +7,7 @@
 // ## Required libraries
 var debug = require('debug')('ector:test');
 var assert = require('assert'); // Maybe one day "should"?
+var sugar = require('sugar');
 var ConceptNetworkState = require('concept-network').ConceptNetworkState;
 
 // ## Module to test
@@ -251,6 +252,13 @@ describe('Bot', function () {
         assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 1 });
         var nodes2 = ector.addEntry("Salut tout le peuple.");
         assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 2 });
+      });
+
+      it('should create tokens from second sentence', function () {
+        var ector = new Ector();
+        var cn = ector.cn;
+        var nodes = ector.addEntry("Salut. Hello.");
+        assert.ok(Object.has(cn.node, '4'));
       });
 
     });
