@@ -261,6 +261,13 @@ describe('Bot', function () {
         assert.ok(Object.has(cn.node, '4'));
       });
 
+      it('should create node for second sentence', function () {
+        var ector = new Ector();
+        var cn = ector.cn;
+        var nodes = ector.addEntry("Salut. Hello.");
+        assert.ok(Object.has(cn.labelIndex, 'sHello.'));
+      });
+
     });
 
     describe('in the ConceptNetworkState', function () {
