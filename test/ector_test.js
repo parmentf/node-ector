@@ -268,6 +268,16 @@ describe('Bot', function () {
         assert.ok(Object.has(cn.labelIndex, 'sHello.'));
       });
 
+      it('should count Hello as a beginning node.', function () {
+        var ector = new Ector();
+        var cn = ector.cn;
+        var nodes = ector.addEntry("Salut. Hello.");
+        assert.equal(typeof cn.node[4].beg, "number");
+        assert.equal(cn.node[4].beg, 1);
+        assert.equal(typeof cn.node[2].beg, "number");
+        assert.equal(cn.node[2].beg, 1);
+      });
+
     });
 
     describe('in the ConceptNetworkState', function () {
