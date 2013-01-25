@@ -27,6 +27,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+* 2013/01/25: version 0.1.5: fix bug: replace all names in a response.
 * 2013/01/17: version 0.1.4: fix bug: beg value for second sentence.
 * 2013/01/17: version 0.1.3: fix bug: create node for second sentence.
 * 2013/01/06: version 0.1.2: add linkNodesToLastSentence()
@@ -36,5 +37,5 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 Warning: this is a work in progress.
 
 ## License
-Copyright (c) 2012 François Parmentier  
+Copyright (c) 2012 François Parmentier
 Licensed under the MIT license.
