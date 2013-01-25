@@ -18,7 +18,7 @@ var Ector = require('../lib/ector.js');
 describe('Instanciations', function () {
 
   describe('No botname', function () {
-    
+
     it("should not throw an exception", function () {
       assert.doesNotThrow(function () {
         var ector = new Ector();
@@ -283,7 +283,7 @@ describe('Bot', function () {
     describe('in the ConceptNetworkState', function () {
 
       var ector, cn, cns, nodes, node2;
-      
+
       before(function () {
         ector = new Ector();
         cn = ector.cn;
@@ -336,6 +336,13 @@ describe('Bot', function () {
       var nodes = ector.addEntry("Hello ECTOR.");
       var response = ector.generateResponse();
       assert.deepEqual(response, { sentence: "Hello Guy.", nodes: [2, 3] });
+    });
+
+    it('should replace both names', function () {
+      var ector = new Ector("ECTOR", "Guy");
+      var nodes = ector.addEntry("Hello ECTOR and ECTOR.");
+      var response = ector.generateResponse();
+      assert.equal(response.sentence, "Hello Guy and Guy.");
     });
 
   });
