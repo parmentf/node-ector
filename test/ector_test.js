@@ -9,6 +9,8 @@ var debug = require('debug')('ector:test');
 var assert = require('assert'); // Maybe one day "should"?
 var sugar = require('sugar');
 var ConceptNetworkState = require('concept-network').ConceptNetworkState;
+var ConceptNetwork = require('concept-network').ConceptNetwork;
+var FileConceptNetwork = require('file-concept-network').FileConceptNetwork;
 
 // ## Module to test
 var Ector = require('../lib/ector.js');
@@ -85,6 +87,7 @@ describe('Instanciations', function () {
   });
 });
 
+// ### Users
 describe('Users', function () {
 
   describe('Change username', function () {
@@ -133,6 +136,7 @@ describe('Users', function () {
 
 });
 
+// ### Bot
 describe('Bot', function () {
 
   describe('Change botname', function () {
@@ -391,6 +395,42 @@ describe('Bot', function () {
       });
 
     });
+  });
+
+});
+
+// ### Injector
+describe('Injector', function () {
+
+  var ector;
+
+  before(function () {
+    ector = new Ector("ECTOR", "Guy");
+  });
+
+  it('should accept another ConceptNetwork', function () {
+    ector.injectConceptNetwork(FileConceptNetwork);
+    assert(ector.cn instanceof ConceptNetwork, "New ConceptNetwork is a ConceptNetwork");
+    assert(ector.cn instanceof FileConceptNetwork, "New ConceptNetwork is a FileConceptNetwork");
+  });
+
+  it('should not accept another class for ConceptNetwork', function () {
+    assert.throws(function () {
+      ector.injectConceptNetwork(ConceptNetworkState);
+    });
+  });
+
+  it('should work as a normal ConceptNetwork', function () {
+    ector.injectConceptNetwork(FileConceptNetwork);
+    ector.addEntry('Hello ECTOR.');
+    var res = ector.generateResponse();
+    assert.equal(res.sentence, 'Hello Guy.');
+  });
+
+  it('should have its supplemental methods', function () {
+    ector.injectConceptNetwork(FileConceptNetwork);
+    assert.equal(typeof ector.cns.Guy.cn.load, 'function');
+    assert.equal(typeof ector.cns.Guy.cn.save, 'function');
   });
 
 });
