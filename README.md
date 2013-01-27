@@ -20,7 +20,7 @@ _(Coming soon)_
 ## Examples
 The [browser-ector](https://github.com/parmentf/browser-ector) is an example of how this library can be used.
 
-You can talk to ECTOR in the browser. [Take a chat.](http://parmentf.github.com/browser-ector/ector.html).
+You can talk to ECTOR in the browser. [Take a chat](http://parmentf.github.com/browser-ector/ector.html).
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [mocha](http://visionmedia.github.com/mocha/).
