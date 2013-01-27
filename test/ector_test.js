@@ -7,10 +7,10 @@
 // ## Required libraries
 var debug = require('debug')('ector:test');
 var assert = require('assert'); // Maybe one day "should"?
+var util = require('util');
 var sugar = require('sugar');
 var ConceptNetworkState = require('concept-network').ConceptNetworkState;
 var ConceptNetwork = require('concept-network').ConceptNetwork;
-var FileConceptNetwork = require('file-concept-network').FileConceptNetwork;
 
 // ## Module to test
 var Ector = require('../lib/ector.js');
@@ -402,6 +402,16 @@ describe('Bot', function () {
 // ### Injector
 describe('Injector', function () {
 
+  // Define a Fake derived ConceptNetwork
+  var StrangeConceptNetwork = function () {
+    // Inherits ConceptNetwork
+    ConceptNetwork.call(this);
+  };
+  util.inherits(StrangeConceptNetwork, ConceptNetwork);
+  StrangeConceptNetwork.prototype.strange = function () {
+    return "Did you say strange?";
+  };
+
   var ector;
 
   before(function () {
@@ -409,9 +419,9 @@ describe('Injector', function () {
   });
 
   it('should accept another ConceptNetwork', function () {
-    ector.injectConceptNetwork(FileConceptNetwork);
+    ector.injectConceptNetwork(StrangeConceptNetwork);
     assert(ector.cn instanceof ConceptNetwork, "New ConceptNetwork is a ConceptNetwork");
-    assert(ector.cn instanceof FileConceptNetwork, "New ConceptNetwork is a FileConceptNetwork");
+    assert(ector.cn instanceof StrangeConceptNetwork, "New ConceptNetwork is a StrangeConceptNetwork");
   });
 
   it('should not accept another class for ConceptNetwork', function () {
@@ -421,16 +431,15 @@ describe('Injector', function () {
   });
 
   it('should work as a normal ConceptNetwork', function () {
-    ector.injectConceptNetwork(FileConceptNetwork);
+    ector.injectConceptNetwork(StrangeConceptNetwork);
     ector.addEntry('Hello ECTOR.');
     var res = ector.generateResponse();
     assert.equal(res.sentence, 'Hello Guy.');
   });
 
   it('should have its supplemental methods', function () {
-    ector.injectConceptNetwork(FileConceptNetwork);
-    assert.equal(typeof ector.cns.Guy.cn.load, 'function');
-    assert.equal(typeof ector.cns.Guy.cn.save, 'function');
+    ector.injectConceptNetwork(StrangeConceptNetwork);
+    assert.equal(typeof ector.cns.Guy.cn.strange, 'function');
   });
 
 });
