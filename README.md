@@ -58,9 +58,10 @@ return _Object_ { response, nodes } The _response_ is a string, and _nodes_ is a
 ## linkNodesToLastSentence
 
 Link nodes to the previous sentence node id (this is automatically set by
-[addEntry], it is the node id of the first sentence of the entry).
+[addEntry](https://github.com/parmentf/node-ector#addentry), it is the node id
+of the first sentence of the entry).
 
-Used with the nodes returned by [addEntry].
+Used with the nodes returned by [addEntry](https://github.com/parmentf/node-ector#addentry).
 
 ### nodes
 
