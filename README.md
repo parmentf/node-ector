@@ -3,7 +3,7 @@
 ECTOR is a learning chatterbot. This is its Node.js version.
 [![Build Status](https://secure.travis-ci.org/parmentf/node-ector.png)](http://travis-ci.org/parmentf/node-ector)
 [![NPM version](https://badge.fury.io/js/ector.png)](http://badge.fury.io/js/ector)
-[![NPM](https://nodei.co/npm/node-ector.png)](https://nodei.co/npm/node-ector/)
+[![NPM](https://nodei.co/npm/ector.png)](https://nodei.co/npm/ector/)
 
 ## Getting Started
 Install the module with: `npm install ector`
