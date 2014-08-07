@@ -1,7 +1,7 @@
 {
   "name": "ector",
   "description": "ECTOR is a learning chatterbot.",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "homepage": "https://github.com/parmentf/node-ector",
   "author": {
     "name": "François Parmentier",

@@ -92,6 +92,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+* 2014/08/07: version 0.1.7: fix bug: injector did not always work.
 * 2013/01/27: version 0.1.6: add a ConceptNetwork injector.
 * 2013/01/25: version 0.1.5: fix bug: replace all names in a response.
 * 2013/01/17: version 0.1.4: fix bug: beg value for second sentence.
