@@ -25,13 +25,13 @@
     "node": ">= 0.10.0"
   },
   "scripts": {
-    "test": "make test"
+    "test": "mocha"
   },
   "dependencies": {
+    "concept-network": "^1.2.0",
     "debug": "0.7.x",
-    "sentence-tokenizer": "*",
-    "concept-network": "*",
     "random-weighted-choice": "0.1.x",
+    "sentence-tokenizer": "*",
     "sugar": "1.3.x"
   },
   "devDependencies": {
