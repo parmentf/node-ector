@@ -1,0 +1,4 @@
+--ignore-dir=.c9
+--ignore-dir=.git
+--ignore-dir=node_modules
+--ignore-dir=lib
