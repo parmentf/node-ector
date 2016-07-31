@@ -1,3 +1,7 @@
+import 'babel-polyfill'
+import Tokenizer from 'sentence-tokenizer'
+import ConceptNetwork from './concept-network'
+
 export function Ector (name = 'ECTOR', username = 'Guy') {
   const ector = {
     set name (name) {
@@ -35,7 +39,49 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
     cns: {
     },
 
-    lastSentenceNodeId: null
+    cn: ConceptNetwork(),
+
+    lastSentenceNodeId: null,
+
+    addEntry (entry) {
+      if (typeof entry !== 'string') {
+        return new Error('An entry should be a string!')
+      }
+      if (!entry.length) {
+        return new Error('An entry should not be empty!')
+      }
+      this.cn.node.push({
+        label: entry,
+        type: 'e'
+      })
+      let allTokenNodes = []
+      const tokenizer = new Tokenizer(this.user, this.name)
+      tokenizer.setEntry(entry)
+      const sentences = tokenizer.getSentences()
+      const sentencesNodes = sentences.map(sentence => ({
+        label: sentence,
+        type: 's'
+      }))
+      this.cn.addNodes(sentencesNodes)
+      sentencesNodes.forEach((sentence, index) => {
+        const tokens = tokenizer.getTokens(index)
+        const tokensNodes = tokens.map((token, index, array) => {
+          const oldToken = this.cn.getNode({label: token, type: 'w'}) ||
+            { beg:0, mid:0, end:0 }
+          const tokenNode = {
+            label: token,
+            type: 'w',
+            beg: oldToken.beg + (index === 0 ? 1 : 0),
+            mid: oldToken.mid + (index !== 0 && index < array.length -1 ? 1 : 0),
+            end: oldToken.end + (index === array.length -1 ? 1 : 0)
+          }
+          return tokenNode
+        })
+        this.cn.addNodes(tokensNodes)
+        allTokenNodes = [...allTokenNodes, ...tokensNodes]
+      })
+      return allTokenNodes
+    }
   }
 
   ector.name = name

@@ -25,12 +25,12 @@
     "test": "mocha"
   },
   "dependencies": {
-    "debug": "^2.2.0"
+    "debug": "^2.2.0",
+    "sentence-tokenizer": "0.0.7"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",
     "babel-eslint": "^6.1.2",
-    "babel-polyfill": "^6.9.1",
     "babel-preset-es2015": "^6.9.0",
     "mocha": "^2.5.3",
     "standard": "^7.1.2"

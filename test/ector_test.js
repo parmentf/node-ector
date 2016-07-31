@@ -93,14 +93,14 @@ describe('Users', function () {
     it('should not be an empty name', function () {
       var ector = Ector()
       assert.equal(ector.user, 'Guy')
-      var userId = ector.user = ''
+      ector.user = ''
       assert.equal(ector.user, 'Guy')
     })
 
     it('should not be too short (< 3)', function () {
       var ector = Ector()
       assert.equal(ector.user, 'Guy')
-      var userId = ector.user = 'Al'
+      ector.user = 'Al'
       assert.equal(ector.user, 'Guy')
     })
 
@@ -120,72 +120,75 @@ describe('Users', function () {
   })
 })
 
-/*
 // ### Bot
-describe.skip('Bot', function () {
+describe('Bot', function () {
   describe('Change botname', function () {
     it('should change for another string', function () {
-      var ector = new Ector()
+      var ector = Ector()
       assert.equal(ector.name, 'ECTOR')
-      ector.setName('Norris')
+      ector.name = 'Norris'
       assert.equal(ector.name, 'Norris')
     })
 
     it('should not work with a number', function () {
-      var ector = new Ector()
+      var ector = Ector()
       assert.equal(ector.name, 'ECTOR')
-      var name = ector.setName(1)
-      assert.equal(name instanceof Error, true)
+      ector.name = 1
+      assert.equal(ector.name, 'ECTOR')
     })
   })
 
   describe('Add an entry', function () {
     describe('in the Concept Network', function () {
       it('should return an error when entry is empty', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var nodes = ector.addEntry('')
         assert.equal(nodes instanceof Error, true)
       })
 
       it('should return an error when entry is not a string', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var nodes = ector.addEntry()
         assert.equal(nodes instanceof Error, true)
       })
 
       it('should create a sentence node', function () {
-        var ector = new Ector()
+        var ector = Ector()
         ector.addEntry('Hello.')
-        assert.equal(ector.cn.node[1].label, 'sHello.')
+        assert.equal(ector.cn.node[1].label, 'Hello.')
+        assert.equal(ector.cn.node[1].type, 's')
       })
 
       it('should return an array of one word node', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var nodes = ector.addEntry('Hello.')
         assert.equal(nodes instanceof Error, false)
         assert.equal(nodes.length, 1)
-        assert.equal(nodes[0].label, 'wHello.')
+        assert.equal(nodes[0].label, 'Hello.')
+        assert.equal(nodes[0].type, 'w')
       })
 
       it('should return an array of two word nodes', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var nodes = ector.addEntry('Hello world.')
         assert.equal(nodes instanceof Error, false)
         assert.equal(nodes.length, 2)
-        assert.equal(nodes[0].label, 'wHello')
-        assert.equal(nodes[1].label, 'wworld.')
+        assert.equal(nodes[0].label, 'Hello')
+        assert.equal(nodes[0].type, 'w')
+        assert.equal(nodes[1].label, 'world.')
+        assert.equal(nodes[1].type, 'w')
       })
 
       it('should add the nodes in the concept network', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var cn = ector.cn
         assert.notEqual(cn, null)
         ector.addEntry('Hello world.')
-        assert.equal(Object.getOwnPropertyNames(cn.node).length, 3)
+        assert.equal(cn.node.length, 4)
       })
 
       it('should add positions in the sentence', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var nodes = ector.addEntry('Salut tout le monde.')
         assert.equal(nodes[0].beg, 1)
         assert.equal(nodes[2].mid, 1)
@@ -193,7 +196,7 @@ describe.skip('Bot', function () {
       })
 
       it('should increment positions in the sentence', function () {
-        var ector = new Ector()
+        var ector = Ector()
         ector.addEntry('Salut tout le monde.')
         var nodes2 = ector.addEntry('Salut le peuple du monde.')
         assert.equal(nodes2[0].beg, 2)
@@ -203,7 +206,7 @@ describe.skip('Bot', function () {
       })
 
       it('should add links between following tokens', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var cn = ector.cn
         ector.addEntry('Salut tout le monde.')
         assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 1 })
@@ -212,7 +215,7 @@ describe.skip('Bot', function () {
       })
 
       it('should add links between sentence and its tokens', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var cn = ector.cn
         ector.addEntry('Salut tout le monde.')
         assert.deepEqual(cn.link['1_2'], { fromId: 1, toId: 2, coOcc: 1 })
@@ -222,14 +225,14 @@ describe.skip('Bot', function () {
       })
 
       it('should add links between following sentences', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var cn = ector.cn
         ector.addEntry('Ah! Oh.')
         assert.deepEqual(cn.link['1_3'], { fromId: 1, toId: 3, coOcc: 1 })
       })
 
       it('should increment links between following tokens', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var cn = ector.cn
         ector.addEntry('Salut tout le monde.')
         assert.deepEqual(cn.link['2_3'], { fromId: 2, toId: 3, coOcc: 1 })
@@ -238,21 +241,21 @@ describe.skip('Bot', function () {
       })
 
       it('should create tokens from second sentence', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var cn = ector.cn
         ector.addEntry('Salut. Hello.')
         assert.ok(Object.has(cn.node, '4'))
       })
 
       it('should create node for second sentence', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var cn = ector.cn
         ector.addEntry('Salut. Hello.')
         assert.ok(Object.has(cn.labelIndex, 'sHello.'))
       })
 
       it('should count Hello as a beginning node.', function () {
-        var ector = new Ector()
+        var ector = Ector()
         var cn = ector.cn
         ector.addEntry('Salut. Hello.')
         assert.equal(typeof cn.node[4].beg, 'number')
@@ -261,8 +264,8 @@ describe.skip('Bot', function () {
         assert.equal(cn.node[2].beg, 1)
       })
     })
-
-    describe('in the ConceptNetworkState', function () {
+/*
+    describe.skip('in the ConceptNetworkState', function () {
       var ector, cn, cns
 
       before(function () {
@@ -301,9 +304,10 @@ describe.skip('Bot', function () {
         })
       })
     })
+*/
   })
 
-  describe('Response', function () {
+  describe.skip('Response', function () {
     // First time, only the same sentence is returned.
     it('should generate a response similar to the stimulus', function () {
       var ector = new Ector('ECTOR', 'Guy')
@@ -320,7 +324,7 @@ describe.skip('Bot', function () {
     })
   })
 
-  describe('PreviousSentenceNodeId', function () {
+  describe.skip('PreviousSentenceNodeId', function () {
     it('should store the last sentence node id', function () {
       var ector = new Ector('ECTOR', 'Guy')
       assert.equal(ector.lastSentenceNodeId, null)
@@ -364,6 +368,7 @@ describe.skip('Bot', function () {
   })
 })
 
+/*
 // ### Injector
 describe.skip('Injector', function () {
   // Define a Fake derived ConceptNetwork
