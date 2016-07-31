@@ -2,7 +2,7 @@ import 'babel-polyfill'
 import Tokenizer from 'sentence-tokenizer'
 import ConceptNetwork from './concept-network'
 import Debug from 'debug'
-const debug = Debug('ector') // eslint-disable-line no-unused-vars
+const debug = Debug('ector:ector') // eslint-disable-line no-unused-vars
 
 export function Ector (name = 'ECTOR', username = 'Guy') {
   const ector = {

@@ -258,10 +258,11 @@ describe('Bot', function () {
         var ector = Ector()
         var cn = ector.cn
         ector.addEntry('Salut. Hello.')
+        debug('cn', cn)
         assert.equal(typeof cn.node[4].beg, 'number')
         assert.equal(cn.node[4].beg, 1)
-        assert.equal(typeof cn.node[2].beg, 'number')
-        assert.equal(cn.node[2].beg, 1)
+        assert.equal(typeof cn.node[3].beg, 'number')
+        assert.equal(cn.node[3].beg, 1)
       })
     })
 /*
