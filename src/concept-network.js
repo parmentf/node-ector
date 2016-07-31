@@ -29,6 +29,10 @@ export default function ConceptNetwork () {
       return this.nodeIndex[type + label]
     },
 
+    getNodeById (id) {
+      return this.node.find(node => node.id === id)
+    },
+
     addNodes (nodes) {
       return nodes.map(node => {
         this.addNode(node)

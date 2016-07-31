@@ -306,7 +306,7 @@ describe('Bot', function () {
     })
   })
 
-  describe.skip('Response', function () {
+  describe('Response', function () {
     // First time, only the same sentence is returned.
     it('should generate a response similar to the stimulus', function () {
       var ector = new Ector('ECTOR', 'Guy')

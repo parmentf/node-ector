@@ -66,6 +66,7 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
         type: 's'
       }))
       const sentencesNodes = this.cn.addNodes(sentencesObjects)
+      this.lastSentenceNodeId = sentencesNodes[sentencesNodes.length - 1].id
       sentencesNodes.forEach((sentence, index) => {
         cns.activate(sentence)
         const tokens = tokenizer.getTokens(index)
@@ -94,6 +95,16 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
         allTokenNodes = [...allTokenNodes, ...tokensNodes]
       })
       return allTokenNodes
+    },
+
+    getLastSentenceNode () {
+      return this.cn.getNodeById(this.lastSentenceNodeId)
+    },
+
+    generateResponse () {
+      const lastSentenceNode = this.getLastSentenceNode()
+      const fakeResponse = lastSentenceNode.label.replace(/{yourname}/g, this.user)
+      return { sentence: fakeResponse, nodes: [2, 3] }
     }
   }
 

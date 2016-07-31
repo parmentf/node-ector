@@ -7,7 +7,6 @@ export function ConceptNetworkState (conceptNetwork) {
     state: [],
 
     activate(node) {
-      debug('activate', node)
       assert.equal(typeof node, 'object')
       assert(node.id)
       assert.equal(typeof node.id, 'number')
@@ -27,7 +26,6 @@ export function ConceptNetworkState (conceptNetwork) {
       } else {
         id = node.id
       }
-      debug(this.state)
       return this.state[id]
     }
   }
