@@ -4,7 +4,7 @@
 // ## Required libraries
 var debug = require('debug')('ector:test') // eslint-disable-line no-unused-vars
 var assert = require('assert') // Maybe one day "should"?
-var util = require('util')
+// var util = require('util')
 // var ConceptNetworkState = require('concept-network').ConceptNetworkState
 // var ConceptNetwork = require('concept-network').ConceptNetwork
 
@@ -42,7 +42,7 @@ describe('Constructor', function () {
     describe('No username', function () {
       it('should be "Guy"', function () {
         var ector = Ector()
-        assert.equal(ector.username, 'Guy', "ECTOR's username should be Guy")
+        assert.equal(ector.user, 'Guy', "ECTOR's username should be Guy")
       })
     })
 
@@ -50,12 +50,12 @@ describe('Constructor', function () {
       it('should not be a number', function () {
         var ector = Ector(null, 1)
         assert.equal(ector.name, 'ECTOR')
-        assert.equal(ector.username, 'Guy')
+        assert.equal(ector.user, 'Guy')
       })
 
       it('should not be a too short', function () {
         var ector = Ector(null, 'Al')
-        assert.equal(ector.username, 'Guy')
+        assert.equal(ector.user, 'Guy')
       })
     })
 
@@ -67,51 +67,51 @@ describe('Constructor', function () {
 
       it('should add one, for an unknown username', function () {
         var ector = Ector(null, 'Guy')
-        ector.setUser('Chuck')
+        ector.user = 'Chuck'
         assert.equal(typeof ector.cns['Chuck'], 'object')
       })
     })
   })
 })
 
-/*// ### Users
-describe.skip('Users', function () {
+/*
+describe('Users', function () {
   describe('Change username', function () {
     it('should change for another string', function () {
-      var ector = new Ector()
+      var ector = Ector()
       assert.equal(ector.username, 'Guy')
-      ector.setUser('Chuck')
+      ector.user = 'Chuck'
       assert.equal(ector.username, 'Chuck')
     })
 
     it('should not work with a number', function () {
-      var ector = new Ector()
+      var ector = Ector()
       assert.equal(ector.username, 'Guy')
       var userId = ector.setUser(1)
       assert.equal(userId instanceof Error, true)
     })
 
     it('should not be an empty name', function () {
-      var ector = new Ector()
+      var ector = Ector()
       assert.equal(ector.username, 'Guy')
       var userId = ector.setUser('')
       assert.equal(userId instanceof Error, true)
     })
 
     it('should not be too short (< 3)', function () {
-      var ector = new Ector()
+      var ector = Ector()
       var userId = ector.setUser('Al')
       assert.equal(userId instanceof Error, true)
     })
 
     it('should reset the lastSentenceNodeId', function () {
-      var ector = new Ector()
+      var ector = Ector()
       ector.lastSentenceNodeId = 1
       ector.setUser('Ali')
       assert.equal(ector.lastSentenceNodeId, null)
     })
 
-    // it('should not be change using property username', function () {
+    // it('should not be changed using property username', function () {
     //   var ector = new Ector()
     //   assert.equal(ector.username, "Guy")
     //   ector.username = "Nope"

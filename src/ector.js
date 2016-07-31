@@ -6,13 +6,12 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
       }
       this._name = name
     },
+
     get name () {
       return this._name
     },
-    username,
-    cns: {
-    },
-    setUser (name) {
+
+    set user(name) {
       if (typeof name !== 'string') {
         name = 'Guy'
       }
@@ -22,12 +21,19 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
       if (!this.cns[name]) {
         this.cns[name] = {}
       }
-      this.username = name
-    }
+      this._username = name
+    },
+
+    get user() {
+      return this._username
+    },
+
+    cns: {
+    },
   }
 
   ector.name = name
-  ector.setUser(username)
+  ector.user = username
 
   return ector
 }
