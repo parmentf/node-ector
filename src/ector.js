@@ -79,8 +79,11 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
         })
         this.cn.addNodes(tokensNodes)
 
-        for (let i = 0; i < tokensNodes.length - 1; i++) {
-          this.cn.addLink(tokensNodes[i].id, tokensNodes[i + 1].id)
+        for (let i = 0; i < tokensNodes.length; i++) {
+          if (i < tokensNodes.length - 1) {
+            this.cn.addLink(tokensNodes[i].id, tokensNodes[i + 1].id)
+          }
+          this.cn.addLink(sentencesNodes[index].id, tokensNodes[i].id)
         }
 
         allTokenNodes = [...allTokenNodes, ...tokensNodes]

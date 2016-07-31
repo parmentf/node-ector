@@ -251,7 +251,7 @@ describe('Bot', function () {
         var ector = Ector()
         var cn = ector.cn
         ector.addEntry('Salut. Hello.')
-        assert.ok(Object.has(cn.labelIndex, 'sHello.'))
+        assert.ok(Object.has(cn.nodeIndex, 'sHello.'))
       })
 
       it('should count Hello as a beginning node.', function () {
