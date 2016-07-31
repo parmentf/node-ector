@@ -103,8 +103,16 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
 
     generateResponse () {
       const lastSentenceNode = this.getLastSentenceNode()
-      const fakeResponse = lastSentenceNode.label.replace(/{yourname}/g, this.user)
+      const fakeResponse = lastSentenceNode.label
+        .replace(/{yourname}/g, this.user)
+        .replace(/{myname}/g, this.name)
       return { sentence: fakeResponse, nodes: [2, 3] }
+    },
+
+    linkNodesToLastSentence(nodes) {
+      for (let i in nodes) {
+        this.cn.addLink(nodes[i], this.lastSentenceNodeId)
+      }
     }
   }
 

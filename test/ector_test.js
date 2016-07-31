@@ -323,7 +323,7 @@ describe('Bot', function () {
     })
   })
 
-  describe.skip('PreviousSentenceNodeId', function () {
+  describe('PreviousSentenceNodeId', function () {
     it('should store the last sentence node id', function () {
       var ector = new Ector('ECTOR', 'Guy')
       assert.equal(ector.lastSentenceNodeId, null)
@@ -336,8 +336,9 @@ describe('Bot', function () {
         var ector = new Ector('ECTOR', 'Guy')
         ector.addEntry('Hello.')
         ector.lastSentenceNodeId = null
-        ector.linkNodesToLastSentence([2])
-        assert.equal(typeof ector.cn.link['2_'], 'undefined')
+        assert.throws(() => {
+          ector.linkNodesToLastSentence([2])
+        })
       })
 
       it('should not create link when null is given', function () {
