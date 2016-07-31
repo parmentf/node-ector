@@ -1,10 +1,14 @@
 export function Ector (name = 'ECTOR', username = 'Guy') {
-  if (typeof name !== 'string') {
-    name = 'ECTOR'
-  }
-
   const ector = {
-    name,
+    set name (name) {
+      if (typeof name !== 'string') {
+        name = 'ECTOR'
+      }
+      this._name = name
+    },
+    get name () {
+      return this._name
+    },
     username,
     cns: {
     },
@@ -22,6 +26,7 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
     }
   }
 
+  ector.name = name
   ector.setUser(username)
 
   return ector
