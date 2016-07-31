@@ -1,3 +1,7 @@
+import assert from 'assert'
+import Debug from 'debug'
+const debug = Debug('concept-network') // eslint-disable-line no-unused-vars
+
 export default function ConceptNetwork () {
   const cn = {
     node: [],
@@ -11,9 +15,14 @@ export default function ConceptNetwork () {
         this.nodeIndex[type + label] = node
         this.node.push(node)
       } else {
-        node = this.getNode({label, type})
-        node.occ++
+        const node2 = this.getNode({label, type})
+        node2.beg += node.beg > 0 ? 1 : 0
+        node2.mid += node.mid > 0 ? 1 : 0
+        node2.end += node.end > 0 ? 1 : 0
+        node2.occ++
+        node = node2
       }
+      return node
     },
 
     getNode ({label, type = ''}) {
@@ -21,14 +30,19 @@ export default function ConceptNetwork () {
     },
 
     addNodes (nodes) {
-      for (let node in nodes) {
-        this.addNode(nodes[node])
-      }
+      return nodes.map(node => {
+        this.addNode(node)
+        return this.getNode(node)
+      })
     },
 
     link: {},
 
     addLink (fromId, toId) {
+      assert(fromId, 'fromId should be defined')
+      assert(toId, 'toId should be defined')
+      assert(typeof fromId, 'number')
+      assert(typeof toId, 'number')
       const link = this.getLink(fromId, toId)
       if (link) {
         link.coOcc++
@@ -42,6 +56,10 @@ export default function ConceptNetwork () {
     },
 
     getLink (fromId, toId) {
+      assert(fromId, 'fromId should be defined')
+      assert(toId, 'toId should be defined')
+      assert(typeof fromId, 'number')
+      assert(typeof toId, 'number')
       return this.link[fromId + '_' + toId]
     }
   }

@@ -1,6 +1,8 @@
 import 'babel-polyfill'
 import Tokenizer from 'sentence-tokenizer'
 import ConceptNetwork from './concept-network'
+import Debug from 'debug'
+const debug = Debug('ector') // eslint-disable-line no-unused-vars
 
 export function Ector (name = 'ECTOR', username = 'Guy') {
   const ector = {
@@ -50,7 +52,7 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
       if (!entry.length) {
         return new Error('An entry should not be empty!')
       }
-      this.cn.node.push({
+      this.cn.addNode({
         label: entry,
         type: 'e'
       })
@@ -58,14 +60,14 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
       const tokenizer = new Tokenizer(this.user, this.name)
       tokenizer.setEntry(entry)
       const sentences = tokenizer.getSentences()
-      const sentencesNodes = sentences.map(sentence => ({
+      const sentencesObjects = sentences.map(sentence => ({
         label: sentence,
         type: 's'
       }))
-      this.cn.addNodes(sentencesNodes)
+      const sentencesNodes = this.cn.addNodes(sentencesObjects)
       sentencesNodes.forEach((sentence, index) => {
         const tokens = tokenizer.getTokens(index)
-        const tokensNodes = tokens.map((token, index, array) => {
+        const tokensObjects = tokens.map((token, index, array) => {
           const oldToken = this.cn.getNode({label: token, type: 'w'}) ||
             { beg: 0, mid: 0, end: 0 }
           const tokenNode = {
@@ -77,7 +79,7 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
           }
           return tokenNode
         })
-        this.cn.addNodes(tokensNodes)
+        const tokensNodes = this.cn.addNodes(tokensObjects)
 
         for (let i = 0; i < tokensNodes.length; i++) {
           if (i < tokensNodes.length - 1) {
