@@ -4,6 +4,9 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
       if (typeof name !== 'string') {
         name = 'ECTOR'
       }
+      if (name.length < 3) {
+        name = 'ECTOR'
+      }
       this._name = name
     },
 
@@ -11,7 +14,7 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
       return this._name
     },
 
-    set user(name) {
+    set user (name) {
       if (typeof name !== 'string') {
         name = 'Guy'
       }
@@ -22,14 +25,17 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
         this.cns[name] = {}
       }
       this._username = name
+      this.lastSentenceNodeId = null
     },
 
-    get user() {
+    get user () {
       return this._username
     },
 
     cns: {
     },
+
+    lastSentenceNodeId: null
   }
 
   ector.name = name

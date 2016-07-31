@@ -74,52 +74,53 @@ describe('Constructor', function () {
   })
 })
 
-/*
 describe('Users', function () {
   describe('Change username', function () {
     it('should change for another string', function () {
       var ector = Ector()
-      assert.equal(ector.username, 'Guy')
+      assert.equal(ector.user, 'Guy')
       ector.user = 'Chuck'
-      assert.equal(ector.username, 'Chuck')
+      assert.equal(ector.user, 'Chuck')
     })
 
     it('should not work with a number', function () {
       var ector = Ector()
-      assert.equal(ector.username, 'Guy')
-      var userId = ector.setUser(1)
-      assert.equal(userId instanceof Error, true)
+      assert.equal(ector.user, 'Guy')
+      ector.user = 1
+      assert.equal(ector.user, 'Guy')
     })
 
     it('should not be an empty name', function () {
       var ector = Ector()
-      assert.equal(ector.username, 'Guy')
-      var userId = ector.setUser('')
-      assert.equal(userId instanceof Error, true)
+      assert.equal(ector.user, 'Guy')
+      var userId = ector.user = ''
+      assert.equal(ector.user, 'Guy')
     })
 
     it('should not be too short (< 3)', function () {
       var ector = Ector()
-      var userId = ector.setUser('Al')
-      assert.equal(userId instanceof Error, true)
+      assert.equal(ector.user, 'Guy')
+      var userId = ector.user = 'Al'
+      assert.equal(ector.user, 'Guy')
     })
 
     it('should reset the lastSentenceNodeId', function () {
       var ector = Ector()
       ector.lastSentenceNodeId = 1
-      ector.setUser('Ali')
+      ector.user = 'Ali'
       assert.equal(ector.lastSentenceNodeId, null)
     })
 
-    // it('should not be changed using property username', function () {
-    //   var ector = new Ector()
-    //   assert.equal(ector.username, "Guy")
-    //   ector.username = "Nope"
-    //   assert.equal(ector.username, "Guy")
-    // })
+//    it('should not be changed using property _username', function () {
+//      var ector = new Ector()
+//      assert.equal(ector.user, "Guy")
+//      ector._username = "Nope"
+//      assert.equal(ector.user, "Guy")
+//    })
   })
 })
 
+/*
 // ### Bot
 describe.skip('Bot', function () {
   describe('Change botname', function () {
