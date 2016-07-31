@@ -4,19 +4,19 @@ export default function ConceptNetwork () {
     nodeIndex: {},
 
     addNode (node) {
-      const {label, type} = node
+      const {label, type = ''} = node
       if (!this.nodeIndex[type + label]) {
         node.occ = 1
+        node.id = this.node.length
         this.nodeIndex[type + label] = node
         this.node.push(node)
-      }
-      else {
+      } else {
         node = this.getNode({label, type})
         node.occ++
       }
     },
 
-    getNode ({label, type}) {
+    getNode ({label, type = ''}) {
       return this.nodeIndex[type + label]
     },
 
@@ -26,7 +26,24 @@ export default function ConceptNetwork () {
       }
     },
 
-    link: {}
+    link: {},
+
+    addLink (fromId, toId) {
+      const link = this.getLink(fromId, toId)
+      if (link) {
+        link.coOcc++
+      } else {
+        this.link[fromId + '_' + toId] = {
+          fromId,
+          toId,
+          coOcc: 1
+        }
+      }
+    },
+
+    getLink (fromId, toId) {
+      return this.link[fromId + '_' + toId]
+    }
   }
 
   return cn
