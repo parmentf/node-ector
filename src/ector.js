@@ -1,6 +1,7 @@
 import 'babel-polyfill'
 import Tokenizer from 'sentence-tokenizer'
 import ConceptNetwork from './concept-network'
+import {ConceptNetworkState} from './concept-network-state'
 import Debug from 'debug'
 const debug = Debug('ector:ector') // eslint-disable-line no-unused-vars
 
@@ -28,7 +29,7 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
         name = 'Guy'
       }
       if (!this.cns[name]) {
-        this.cns[name] = {}
+        this.cns[name] = ConceptNetworkState()
       }
       this._username = name
       this.lastSentenceNodeId = null
@@ -45,7 +46,7 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
 
     lastSentenceNodeId: null,
 
-    addEntry (entry) {
+    addEntry (entry, cns = this.cns[this.user]) {
       if (typeof entry !== 'string') {
         return new Error('An entry should be a string!')
       }
@@ -66,6 +67,7 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
       }))
       const sentencesNodes = this.cn.addNodes(sentencesObjects)
       sentencesNodes.forEach((sentence, index) => {
+        cns.activate(sentence)
         const tokens = tokenizer.getTokens(index)
         const tokensObjects = tokens.map((token, index, array) => {
           const oldToken = this.cn.getNode({label: token, type: 'w'}) ||
@@ -86,6 +88,7 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
             this.cn.addLink(tokensNodes[i].id, tokensNodes[i + 1].id)
           }
           this.cn.addLink(sentencesNodes[index].id, tokensNodes[i].id)
+          cns.activate(tokensNodes[i])
         }
 
         allTokenNodes = [...allTokenNodes, ...tokensNodes]

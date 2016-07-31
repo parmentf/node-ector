@@ -5,7 +5,7 @@
 var debug = require('debug')('ector:test') // eslint-disable-line no-unused-vars
 var assert = require('assert') // Maybe one day "should"?
 // var util = require('util')
-// var ConceptNetworkState = require('concept-network').ConceptNetworkState
+var ConceptNetworkState = require('../lib/concept-network-state').ConceptNetworkState
 // var ConceptNetwork = require('concept-network').ConceptNetwork
 
 var Ector = require('../lib/ector.js').Ector
@@ -258,15 +258,14 @@ describe('Bot', function () {
         var ector = Ector()
         var cn = ector.cn
         ector.addEntry('Salut. Hello.')
-        debug('cn', cn)
         assert.equal(typeof cn.node[4].beg, 'number')
         assert.equal(cn.node[4].beg, 1)
         assert.equal(typeof cn.node[3].beg, 'number')
         assert.equal(cn.node[3].beg, 1)
       })
     })
-/*
-    describe.skip('in the ConceptNetworkState', function () {
+
+    describe('in the ConceptNetworkState', function () {
       var ector, cn, cns
 
       before(function () {
@@ -297,15 +296,14 @@ describe('Bot', function () {
         })
 
         it('should activate the sentence node', function () {
-          assert.equal(cns.getActivationValue(4), 100)
+          assert.equal(cns.getActivationValue(5), 100)
         })
 
         it('should activate the token node', function () {
-          assert.equal(cns.getActivationValue(5), 100)
+          assert.equal(cns.getActivationValue(6), 100)
         })
       })
     })
-*/
   })
 
   describe.skip('Response', function () {
