@@ -6,14 +6,16 @@ export function ConceptNetworkState (conceptNetwork) {
   const cns = {
     state: [],
 
-    activate(node) {
+    cn: conceptNetwork,
+
+    activate (node) {
       assert.equal(typeof node, 'object')
       assert(node.id)
       assert.equal(typeof node.id, 'number')
       this.state[node.id] = 100
     },
 
-    getActivationValue(node) {
+    getActivationValue (node) {
       let id = -1
       if (typeof node === 'number') {
         id = node

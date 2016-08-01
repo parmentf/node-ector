@@ -1,7 +1,8 @@
 import 'babel-polyfill'
 import Tokenizer from 'sentence-tokenizer'
-import ConceptNetwork from './concept-network'
+import {ConceptNetwork} from './concept-network'
 import {ConceptNetworkState} from './concept-network-state'
+import assert from 'assert'
 import Debug from 'debug'
 const debug = Debug('ector:ector') // eslint-disable-line no-unused-vars
 
@@ -109,15 +110,31 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
       return { sentence: fakeResponse, nodes: [2, 3] }
     },
 
-    linkNodesToLastSentence(nodes) {
+    linkNodesToLastSentence (nodes) {
       for (let i in nodes) {
         this.cn.addLink(nodes[i], this.lastSentenceNodeId)
       }
+    },
+
+    set ConceptNetwork (newConceptNetwork) {
+      assert.equal(typeof newConceptNetwork, 'function')
+      this._ConceptNetwork = newConceptNetwork
+      this.cn = this._ConceptNetwork()
+      assert(this.cn.addNode)
+      assert(this.cn.addLink)
+      assert(this.cn.getNode)
+      this.cns[this.user] = ConceptNetworkState(this.cn)
+    },
+
+    get ConceptNetwork () {
+      return this._ConceptNetwork
     }
+
   }
 
   ector.name = name
   ector.user = username
+  ector.ConceptNetwork = ConceptNetwork
 
   return ector
 }

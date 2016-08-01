@@ -6,7 +6,7 @@ var debug = require('debug')('ector:test') // eslint-disable-line no-unused-vars
 var assert = require('assert') // Maybe one day "should"?
 // var util = require('util')
 var ConceptNetworkState = require('../lib/concept-network-state').ConceptNetworkState
-// var ConceptNetwork = require('concept-network').ConceptNetwork
+var ConceptNetwork = require('../lib/concept-network').ConceptNetwork
 
 var Ector = require('../lib/ector.js').Ector
 
@@ -368,47 +368,44 @@ describe('Bot', function () {
   })
 })
 
-/*
 // ### Injector
-describe.skip('Injector', function () {
+describe('Injector', function () {
   // Define a Fake derived ConceptNetwork
-  var StrangeConceptNetwork = function () {
-    // Inherits ConceptNetwork
-    ConceptNetwork.call(this)
+  const StrangeConceptNetwork = function () {
+    const cn = ConceptNetwork()
+    cn.strange = function () {
+      return 'Did you say strange?'
+    }
+    return cn
   }
-  util.inherits(StrangeConceptNetwork, ConceptNetwork)
-  StrangeConceptNetwork.prototype.strange = function () {
-    return 'Did you say strange?'
-  }
-
-  var ector
+  let ector = null
 
   before(function () {
-    ector = new Ector('ECTOR", "Guy')
+    ector = Ector('ECTOR', 'Guy')
   })
 
   it('should accept another ConceptNetwork', function () {
-    ector.injectConceptNetwork(StrangeConceptNetwork)
-    assert(ector.cn instanceof ConceptNetwork, 'New ConceptNetwork is a ConceptNetwork')
-    assert(ector.cn instanceof StrangeConceptNetwork, 'New ConceptNetwork is a StrangeConceptNetwork')
+    ector.ConceptNetwork = StrangeConceptNetwork
+    assert(ector.cn.node, 'New ConceptNetwork has a node property')
+    assert(ector.cn.strange, 'New ConceptNetwork has a strange property')
+    assert.equal(ector.cn.strange(), 'Did you say strange?')
   })
 
   it('should not accept another class for ConceptNetwork', function () {
     assert.throws(function () {
-      ector.injectConceptNetwork(ConceptNetworkState)
+      ector.ConceptNetwork = ConceptNetworkState
     })
   })
 
   it('should work as a normal ConceptNetwork', function () {
-    ector.injectConceptNetwork(StrangeConceptNetwork)
+    ector.ConceptNetwork = StrangeConceptNetwork
     ector.addEntry('Hello ECTOR.')
     var res = ector.generateResponse()
     assert.equal(res.sentence, 'Hello Guy.')
   })
 
   it('should have its supplemental methods', function () {
-    ector.injectConceptNetwork(StrangeConceptNetwork)
+    ector.ConceptNetwork = StrangeConceptNetwork
     assert.equal(typeof ector.cns.Guy.cn.strange, 'function')
   })
 })
-*/

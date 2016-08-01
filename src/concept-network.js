@@ -2,7 +2,7 @@ import assert from 'assert'
 import Debug from 'debug'
 const debug = Debug('ector:concept-network') // eslint-disable-line no-unused-vars
 
-export default function ConceptNetwork () {
+export function ConceptNetwork () {
   const cn = {
     node: [],
     nodeIndex: {},
