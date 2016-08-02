@@ -137,12 +137,12 @@ export function ConceptNetworkState (conceptNetwork) {
       if (!cb && typeof options === 'function') {
         cb = options
         options = {
-          decay      : 40,
-          memoryPerf : 100
+          decay: 40,
+          memoryPerf: 100
         }
       }
       if (options && typeof options !== 'object') {
-        return cb(new Error("propagate() parameter should be an object"))
+        return cb(new Error('propagate() parameter should be an object'))
       }
 
       // Aging
@@ -174,20 +174,19 @@ export function ConceptNetworkState (conceptNetwork) {
         if (state === undefined) {
           state = { activationValue: 0, oldActivationValue: 0, age: 0 }
         }
-        const decay      = options.decay || 40
+        const decay = options.decay || 40
         const memoryPerf = options.memoryPerf || 100
         const minusAge = 200 / (1 + Math.exp(-state.age / memoryPerf)) - 100
         let newActivationValue
 
-        // If this node is not influenced at all
         if (!influenceValue[id]) {
+          // If this node is not influenced at all
           newActivationValue = state.oldActivationValue -
                                decay * state.oldActivationValue / 100 - minusAge
-        }
-        // If this node receives influence
-        else {
-          let influence = influenceValue[id];
-          const nbIncomings = influenceNb[id];
+        } else {
+          // If this node receives influence
+          let influence = influenceValue[id]
+          const nbIncomings = influenceNb[id]
           influence /= Math.log(this.normalNumberComingLinks + nbIncomings) /
                        Math.log(this.normalNumberComingLinks)
           newActivationValue = state.oldActivationValue -

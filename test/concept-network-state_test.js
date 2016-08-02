@@ -370,7 +370,7 @@ describe('ConceptNetworkState', function () {
     })
 
     it('should accept options', function (done) {
-      cns.propagate({ anything: 1}, function (err) {
+      cns.propagate({ anything: 1 }, function (err) {
         done(err)
       })
     })
