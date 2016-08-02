@@ -77,10 +77,12 @@ export function ConceptNetwork () {
           return cb(new Error('toId should be a number'), null)
         }
       }
-      assert(fromId, 'fromId should be defined')
-      assert(toId, 'toId should be defined')
       assert(typeof fromId, 'number')
       assert(typeof toId, 'number')
+      assert(fromId !== undefined, 'fromId should be defined')
+      assert(fromId !== null, 'fromId should not be null')
+      assert(toId !== undefined, 'toId should be defined')
+      assert(toId !== null, 'fromId should not be null')
       let link = this.getLink(fromId, toId)
       const linkId = fromId + '_' + toId
       if (link) {
@@ -109,10 +111,8 @@ export function ConceptNetwork () {
     },
 
     getLink (fromId, toId, cb) {
-      assert(fromId, 'fromId should be defined')
-      assert(toId, 'toId should be defined')
+      assert(fromId !== undefined, 'fromId should be defined')
       assert(typeof fromId, 'number')
-      assert(typeof toId, 'number')
       let linkId
       if (typeof fromId === 'string') {
         linkId = fromId
@@ -123,6 +123,8 @@ export function ConceptNetwork () {
       } else {
         linkId = fromId + '_' + toId
       }
+      assert(toId !== undefined, 'toId should be defined')
+      assert(typeof toId, 'number')
       if (cb) {
         return cb(null, this.link[linkId])
       }

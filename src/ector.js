@@ -30,7 +30,7 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
         name = 'Guy'
       }
       if (!this.cns[name]) {
-        this.cns[name] = ConceptNetworkState()
+        this.cns[name] = ConceptNetworkState(this.cn)
       }
       this._username = name
       this.lastSentenceNodeId = null
@@ -115,6 +115,8 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
         this.cn.addLink(nodes[i], this.lastSentenceNodeId)
       }
     },
+
+    _ConceptNetwork: ConceptNetwork(),
 
     set ConceptNetwork (newConceptNetwork) {
       assert.equal(typeof newConceptNetwork, 'function')
