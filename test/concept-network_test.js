@@ -47,52 +47,52 @@ describe('ConceptNetwork', function () {
       cn = ConceptNetwork()
     })
 
-    it('should return an object', function (done) {
-      cn.addNode({ label: 'Chuck Norris' }, function (err, node) {
+    it('should return an object', function () {
+      return cn.addNode({ label: 'Chuck Norris' })
+      .then(node => {
         expect(node.id).to.be.equal(0)
         expect(node.label).to.be.equal('Chuck Norris')
         expect(node.occ).to.be.equal(1)
-        done(err)
       })
     })
 
-    it('should increment occ', function (done) {
-      cn.addNode({ label: 'Chuck Norris' }, function (err, node) {
+    it('should increment occ', function () {
+      return cn.addNode({ label: 'Chuck Norris' })
+      .then(node => {
         expect(node.id).to.be.equal(0)
         expect(node.occ).to.be.equal(2)
-        done(err)
       })
     })
 
-    it('should increment nodeLastId', function (done) {
-      cn.addNode({ label: 'World' }, function (err, node) {
+    it('should increment nodeLastId', function () {
+      return cn.addNode({ label: 'World' })
+      .then(node => {
         expect(node.id).to.be.equal(1)
         expect(cn.node).to.have.lengthOf(2)
-        done(err)
       })
     })
 
-    it('should increment a previous node too', function (done) {
-      cn.addNode({ label: 'Chuck Norris' }, function (err, node) {
+    it('should increment a previous node too', function () {
+      return cn.addNode({ label: 'Chuck Norris' })
+      .then(node => {
         expect(node.id).to.be.equal(0)
         expect(node.occ).to.be.equal(3)
-        done(err)
       })
     })
 
-    it('should increment more than one', function (done) {
-      cn.addNode({ label: 'Steven Seagal' }, 3, function (err, node) {
+    it('should increment more than one', function () {
+      return cn.addNode({ label: 'Steven Seagal' }, 3)
+      .then(node => {
         expect(node.id).to.be.equal(2)
         expect(node.occ).to.be.equal(3)
-        done(err)
       })
     })
 
-    it('should accept a second argument with a null value', function (done) {
-      cn.addNode({ label: 'Jean-Claude Van Damme' }, null, function (err, node) {
+    it('should accept a second argument with a undefined value', function () {
+      return cn.addNode({ label: 'Jean-Claude Van Damme' }, undefined)
+      .then(node => {
         expect(node.id).to.be.equal(3)
         expect(node.occ).to.be.equal(1)
-        done(err)
       })
     })
   })
@@ -126,25 +126,26 @@ describe('ConceptNetwork', function () {
   describe('removeNode', function () {
     beforeEach(function (done) {
       cn = ConceptNetwork()
-      cn.addNode({ label: 'Node 1' }, function (err1, node1) {
+      cn.addNode({ label: 'Node 1' })
+      .then(node1 => {
         node1.occ = 2
-        if (err1) return done(err1)
-        cn.addNode({ label: 'Node 2' }, function (err2, node2) {
-          if (err2) return done(err2)
-          cn.addNode({ label: 'Node 3' }, function (err3, node3) {
-            if (err3) return done(err3)
-            cn.addNode({ label: 'Node 4' }, function (err4, node4) {
-              if (err4) return done(err4)
-              cn.addLink(2, 3, function (err5, link23) {
-                if (err5) return done(err5)
-                cn.addLink(3, 4, function (err6, link34) {
-                  done(err6)
-                })
-              })
-            })
+        return cn.addNode({ label: 'Node 2' })
+      })
+      .then(node2 => {
+        return cn.addNode({ label: 'Node 3' })
+      })
+      .then(node3 => {
+        return cn.addNode({ label: 'Node 4' })
+      })
+      .then(node4 => {
+        cn.addLink(2, 3, function (err5, link23) {
+          if (err5) return done(err5)
+          cn.addLink(3, 4, function (err6, link34) {
+            done(err6)
           })
         })
       })
+      .catch(err => done(err))
     })
 
     it('should remove even a node with occ value of 2', function (done) {
@@ -171,16 +172,14 @@ describe('ConceptNetwork', function () {
   })
 
   describe('addLink', function () {
-    before(function (done) {
+    before(function () {
       cn = new ConceptNetwork()
-      cn.addNode({ label: 'Node 1' }, function (err1, node1) {
-        if (err1) return done(err1)
-        cn.addNode({ label: 'Node 2' }, function (err2, node2) {
-          if (err2) return done(err2)
-          cn.addNode({ label: 'Node 3' }, function (err3, node3) {
-            done(err3)
-          })
-        })
+      return cn.addNode({ label: 'Node 1' })
+      .then(node1 => {
+        return cn.addNode({ label: 'Node 2' })
+      })
+      .then(node2 => {
+        return cn.addNode({ label: 'Node 3' })
       })
     })
 
@@ -234,10 +233,10 @@ describe('ConceptNetwork', function () {
   describe('decrementLink', function () {
     before(function (done) {
       cn = ConceptNetwork()
-      cn.addNode({ label: 'Node 1' }, function (err) {
-        if (err) return done(err)
-        cn.addNode({ label: 'Node 2' }, function (err) {
-          if (err) return done(err)
+      cn.addNode({ label: 'Node 1' })
+      .then(() => {
+        cn.addNode({ label: 'Node 2' })
+        .then(() => {
           cn.addLink(1, 2, function (err) {
             if (err) return done(err)
             cn.addLink(1, 2, function (err) {
@@ -246,6 +245,7 @@ describe('ConceptNetwork', function () {
           })
         })
       })
+      .catch(err => done(err))
     })
 
     it('should decrement a coOcc value of 2', function (done) {
@@ -268,15 +268,16 @@ describe('ConceptNetwork', function () {
   describe('removeLink', function () {
     beforeEach(function (done) {
       cn = ConceptNetwork()
-      cn.addNode({ label: 'Node 1' }, function (err) {
-        if (err) return done(err)
-        cn.addNode({ label: 'Node 2' }, function (err) {
-          if (err) return done(err)
+      cn.addNode({ label: 'Node 1' })
+      .then(() => {
+        cn.addNode({ label: 'Node 2' })
+        .then(() => {
           cn.addLink(1, 2, function (err) {
             done(err)
           })
         })
       })
+      .catch(err => done(err))
     })
 
     it('should remove the link', function (done) {
@@ -299,12 +300,12 @@ describe('ConceptNetwork', function () {
   describe('getters', function () {
     before(function (done) {
       cn = ConceptNetwork()
-      cn.addNode({ label: 'Node 1' }, function (err) {
-        if (err) return done(err)
-        cn.addNode({ label: 'Node 2' }, function (err) {
-          if (err) return done(err)
-          cn.addNode({ label: 'Node 3' }, function (err) {
-            if (err) return done(err)
+      cn.addNode({ label: 'Node 1' })
+      .then(() => {
+        cn.addNode({ label: 'Node 2' })
+        .then(() => {
+          cn.addNode({ label: 'Node 3' })
+          .then(() => {
             cn.addLink(1, 2, function (err) {
               if (err) return done(err)
               cn.addLink(1, 3, function (err) {
@@ -317,6 +318,7 @@ describe('ConceptNetwork', function () {
           })
         })
       })
+      .catch(err => done(err))
     })
 
     describe('getNode', function () {

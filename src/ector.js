@@ -48,54 +48,58 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
     lastSentenceNodeId: null,
 
     addEntry (entry, cns = this.cns[this.user]) {
-      if (typeof entry !== 'string') {
-        return new Error('An entry should be a string!')
-      }
-      if (!entry.length) {
-        return new Error('An entry should not be empty!')
-      }
-      this.cn.addNode({
-        label: entry,
-        type: 'e'
-      })
-      let allTokenNodes = []
-      const tokenizer = new Tokenizer(this.user, this.name)
-      tokenizer.setEntry(entry)
-      const sentences = tokenizer.getSentences()
-      const sentencesObjects = sentences.map(sentence => ({
-        label: sentence,
-        type: 's'
-      }))
-      const sentencesNodes = this.cn.addNodes(sentencesObjects)
-      this.lastSentenceNodeId = sentencesNodes[sentencesNodes.length - 1].id
-      sentencesNodes.forEach((sentence, index) => {
-        cns.activate(sentence)
-        const tokens = tokenizer.getTokens(index)
-        const tokensObjects = tokens.map((token, index, array) => {
-          const oldToken = this.cn.getNode({label: token, type: 'w'}) ||
-            { beg: 0, mid: 0, end: 0 }
-          const tokenNode = {
-            label: token,
-            type: 'w',
-            beg: oldToken.beg + (index === 0 ? 1 : 0),
-            mid: oldToken.mid + (index !== 0 && index < array.length - 1 ? 1 : 0),
-            end: oldToken.end + (index === array.length - 1 ? 1 : 0)
-          }
-          return tokenNode
-        })
-        const tokensNodes = this.cn.addNodes(tokensObjects)
-
-        for (let i = 0; i < tokensNodes.length; i++) {
-          if (i < tokensNodes.length - 1) {
-            this.cn.addLink(tokensNodes[i].id, tokensNodes[i + 1].id)
-          }
-          this.cn.addLink(sentencesNodes[index].id, tokensNodes[i].id)
-          cns.activate(tokensNodes[i])
+      return new Promise((resolve, reject) => {
+        if (typeof entry !== 'string') {
+          return reject(new Error('An entry should be a string!'))
         }
+        if (!entry.length) {
+          return reject(new Error('An entry should not be empty!'))
+        }
+        this.cn.addNode({
+          label: entry,
+          type: 'e'
+        })
+        .then(node => {
+          let allTokenNodes = []
+          const tokenizer = new Tokenizer(this.user, this.name)
+          tokenizer.setEntry(entry)
+          const sentences = tokenizer.getSentences()
+          const sentencesObjects = sentences.map(sentence => ({
+            label: sentence,
+            type: 's'
+          }))
+          const sentencesNodes = this.cn.addNodes(sentencesObjects)
+          this.lastSentenceNodeId = sentencesNodes[sentencesNodes.length - 1].id
+          sentencesNodes.forEach((sentence, index) => {
+            cns.activate(sentence)
+            const tokens = tokenizer.getTokens(index)
+            const tokensObjects = tokens.map((token, index, array) => {
+              const oldToken = this.cn.getNode({label: token, type: 'w'}) ||
+                { beg: 0, mid: 0, end: 0 }
+              const tokenNode = {
+                label: token,
+                type: 'w',
+                beg: oldToken.beg + (index === 0 ? 1 : 0),
+                mid: oldToken.mid + (index !== 0 && index < array.length - 1 ? 1 : 0),
+                end: oldToken.end + (index === array.length - 1 ? 1 : 0)
+              }
+              return tokenNode
+            })
+            const tokensNodes = this.cn.addNodes(tokensObjects)
 
-        allTokenNodes = [...allTokenNodes, ...tokensNodes]
+            for (let i = 0; i < tokensNodes.length; i++) {
+              if (i < tokensNodes.length - 1) {
+                this.cn.addLink(tokensNodes[i].id, tokensNodes[i + 1].id)
+              }
+              this.cn.addLink(sentencesNodes[index].id, tokensNodes[i].id)
+              cns.activate(tokensNodes[i])
+            }
+
+            allTokenNodes = [...allTokenNodes, ...tokensNodes]
+          })
+          return resolve(allTokenNodes)
+        })
       })
-      return allTokenNodes
     },
 
     getLastSentenceNode () {

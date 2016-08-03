@@ -1,3 +1,4 @@
+import 'babel-polyfill'
 import assert from 'assert'
 import Debug from 'debug'
 const debug = Debug('ector:concept-network') // eslint-disable-line no-unused-vars
@@ -10,31 +11,24 @@ export function ConceptNetwork () {
     fromIndex: [],
     toIndex: [],
 
-    addNode (node, inc, cb) {
-      if (!cb) {
-        cb = inc
-        inc = 1
-      } else {
-        inc = inc || 1
-      }
-      const {label, type = ''} = node
-      if (!this.nodeIndex[type + label]) {
-        node.occ = inc
-        node.id = this.node.length
-        this.nodeIndex[type + label] = node
-        this.node.push(node)
-      } else {
-        const node2 = this.getNode({label, type})
-        node2.beg += node.beg > 0 ? 1 : 0
-        node2.mid += node.mid > 0 ? 1 : 0
-        node2.end += node.end > 0 ? 1 : 0
-        node2.occ += inc
-        node = node2
-      }
-      if (cb) {
-        return cb(null, node)
-      }
-      return node
+    addNode (node, inc = 1) {
+      return new Promise((resolve, reject) => {
+        const {label, type = ''} = node
+        if (!this.nodeIndex[type + label]) {
+          node.occ = inc
+          node.id = this.node.length
+          this.nodeIndex[type + label] = node
+          this.node.push(node)
+        } else {
+          const node2 = this.getNode({label, type})
+          node2.beg += node.beg > 0 ? 1 : 0
+          node2.mid += node.mid > 0 ? 1 : 0
+          node2.end += node.end > 0 ? 1 : 0
+          node2.occ += inc
+          node = node2
+        }
+        return resolve(node)
+      })
     },
 
     getNode ({label, type = ''}, cb) {

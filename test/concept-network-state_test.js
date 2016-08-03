@@ -46,12 +46,12 @@ describe('ConceptNetworkState', function () {
     let cn = null
     let cns = null
     let node1 = null
-    before(function (done) {
+    before(function () {
       cn = ConceptNetwork()
       cns = ConceptNetworkState(cn)
-      cn.addNode({ label: 'Node 1' }, function (err, node) {
+      return cn.addNode({ label: 'Node 1' })
+      .then(node => {
         node1 = node
-        done(err)
       })
     })
 
@@ -73,23 +73,17 @@ describe('ConceptNetworkState', function () {
   describe('#getters', function () {
     let cn, cns, node1, node2, node3
     describe('##getActivationValue', function () {
-      before(function (done) {
+      before(function () {
         cn = ConceptNetwork()
         cns = ConceptNetworkState(cn)
-        cn.addNode({ label: 'Node 1' }, function (err, node) {
-          if (err) { return done(err) }
+        return cn.addNode({ label: 'Node 1' })
+        .then(node => {
           node1 = node
-          cn.addNode({ label: 'Node 2' }, function (err, node) {
-            if (err) { return done(err) }
-            node2 = node
-            cns.activate(node1.id)
-            .then(state => {
-              done()
-            })
-            .catch(err => {
-              done(err)
-            })
-          })
+          return cn.addNode({ label: 'Node 2' })
+        })
+        .then(node => {
+          node2 = node
+          return cns.activate(node1.id)
         })
       })
 
@@ -120,24 +114,20 @@ describe('ConceptNetworkState', function () {
     })
 
     describe('##getOldActivationValue', function () {
-      before(function (done) {
+      before(function () {
         cn = ConceptNetwork()
         cns = ConceptNetworkState(cn)
-        cn.addNode({ label: 'Node 1' }, function (err, node) {
-          if (err) { return done(err) }
+        return cn.addNode({ label: 'Node 1' })
+        .then(node => {
           node1 = node
-          cn.addNode({ label: 'Node 2' }, function (err, node) {
-            if (err) { return done(err) }
-            node2 = node
-            cns.activate(node1.id)
-            .then(state => {
-              return cns.propagate()
-            })
-            .then(() => done())
-            .catch(err => {
-              done(err)
-            })
-          })
+          return cn.addNode({ label: 'Node 2' })
+        })
+        .then(node => {
+          node2 = node
+          return cns.activate(node1.id)
+        })
+        .then(state => {
+          return cns.propagate()
         })
       })
 
@@ -157,20 +147,20 @@ describe('ConceptNetworkState', function () {
     })
 
     describe('##getMaximumActivationValue', function () {
-      before(function (done) {
+      before(function () {
         cn = ConceptNetwork()
         cns = ConceptNetworkState(cn)
-        cn.addNode({ label: 'Node 1' }, function (err, node) {
-          if (err) return done(err)
+        return cn.addNode({ label: 'Node 1' })
+        .then(node => {
           node1 = node
-          cn.addNode({ label: 'Node 2', type: 's' }, function (err, node) {
-            if (err) return done(err)
-            node2 = node
-            cn.addNode({ label: 'Node 3', type: 't' }, function (err, node) {
-              node3 = node
-              done(err)
-            })
-          })
+          return cn.addNode({ label: 'Node 2', type: 's' })
+        })
+        .then(node => {
+          node2 = node
+          return cn.addNode({ label: 'Node 3', type: 't' })
+        })
+        .then(node => {
+          node3 = node
         })
       })
 
@@ -215,20 +205,20 @@ describe('ConceptNetworkState', function () {
     })
 
     describe('##getActivatedTypedNodes', function () {
-      before(function (done) {
+      before(function () {
         cn = ConceptNetwork()
         cns = ConceptNetworkState(cn)
-        cn.addNode({ label: 'Node 1' }, function (err, node) {
-          if (err) return done(err)
+        return cn.addNode({ label: 'Node 1' })
+        .then(node => {
           node1 = node
-          cn.addNode({ label: 'Node 2', type: 's' }, function (err, node) {
-            if (err) return done(err)
-            node2 = node
-            cn.addNode({ label: 'Node 3', type: 't' }, function (err, node) {
-              node3 = node
-              done(err)
-            })
-          })
+          return cn.addNode({ label: 'Node 2', type: 's' })
+        })
+        .then(node => {
+          node2 = node
+          return cn.addNode({ label: 'Node 3', type: 't' })
+        })
+        .then(node => {
+          node3 = node
         })
       })
 
@@ -307,16 +297,16 @@ describe('ConceptNetworkState', function () {
   describe('#setters', function () {
     var cn, cns, node1, node2
     describe('##setActivationValue', function () {
-      before(function (done) {
+      before(function () {
         cn = ConceptNetwork()
         cns = ConceptNetworkState(cn)
-        cn.addNode({ label: 'Node 1' }, function (err, node) {
-          if (err) { return done(err) }
+        return cn.addNode({ label: 'Node 1' })
+        .then(node => {
           node1 = node
-          cn.addNode({ label: 'Node 2' }, function (err, node) {
-            node2 = node
-            done(err)
-          })
+          return cn.addNode({ label: 'Node 2' })
+        })
+        .then(node => {
+          node2 = node
         })
       })
 
@@ -347,15 +337,16 @@ describe('ConceptNetworkState', function () {
     before(function (done) {
       cn = ConceptNetwork()
       cns = ConceptNetworkState(cn)
-      cn.addNode({ label: 'Node 1' }, function (err, node) {
-        if (err) return done(err)
+      cn.addNode({ label: 'Node 1' })
+      .then(node => {
         node1 = node
-        cn.addNode({ label: 'Node 2' }, function (err, node) {
-          if (err) return done(err)
-          node2 = node
-          cn.addLink(node1.id, node2.id, done)
-        })
+        return cn.addNode({ label: 'Node 2' })
       })
+      .then(node => {
+        node2 = node
+        cn.addLink(node1.id, node2.id, done)
+      })
+      .catch(err => done(err))
     })
 
     it('should deactivate node without afferent links', function () {
@@ -422,8 +413,8 @@ describe('ConceptNetworkState', function () {
 
     it('should use already existing influenceValue', function (done) {
       var node3
-      cn.addNode({ label: 'Node 3' }, function (err, node) {
-        if (err) return done(err)
+      cn.addNode({ label: 'Node 3' })
+      .then(node => {
         node3 = node
         cn.addLink(node3.id, node2.id, function (err) {
           if (err) return done(err)
@@ -435,6 +426,7 @@ describe('ConceptNetworkState', function () {
           .catch(err => done(err))
         })
       })
+      .catch(err => done(err))
     })
   })
 })
