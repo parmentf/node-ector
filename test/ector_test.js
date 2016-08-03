@@ -281,12 +281,21 @@ describe('Bot', function () {
         })
 
         it('should activate the sentence node', function () {
-          assert.equal(cns.getActivationValue(1), 100)
+          return cns.getActivationValue(1)
+          .then(value => {
+            assert.equal(value, 100)
+          })
         })
 
         it('should activate the token node', function () {
-          assert.equal(cns.getActivationValue(2), 100)
-          assert.equal(cns.getActivationValue(3), 100)
+          return cns.getActivationValue(2)
+          .then(value2 => {
+            assert.equal(value2, 100)
+            return cns.getActivationValue(3)
+          })
+          .then(value3 => {
+            assert.equal(value3, 100)
+          })
         })
       })
 
@@ -296,11 +305,17 @@ describe('Bot', function () {
         })
 
         it('should activate the sentence node', function () {
-          assert.equal(cns.getActivationValue(5), 100)
+          return cns.getActivationValue(5)
+          .then(value => {
+            assert.equal(value, 100)
+          })
         })
 
         it('should activate the token node', function () {
-          assert.equal(cns.getActivationValue(6), 100)
+          return cns.getActivationValue(6)
+          .then(value => {
+            assert.equal(value, 100)
+          })
         })
       })
     })

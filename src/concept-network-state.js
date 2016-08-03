@@ -1,3 +1,4 @@
+import 'babel-polyfill'
 import assert from 'assert'
 import Debug from 'debug'
 const debug = Debug('ector:concept-network-state') // eslint-disable-line no-unused-vars
@@ -25,181 +26,180 @@ export function ConceptNetworkState (conceptNetwork) {
       return id
     },
 
-    activate (node, cb) {
-      const id = this.getNodeId(node)
-      assert.ifError(id instanceof Error)
-      if (this.state[id] === undefined) {
-        this.state[id] = {
-          activationValue: 100,
-          age: 0,
-          oldActivationValue: 0
+    activate (node) {
+      return new Promise((resolve, reject) => {
+        const id = this.getNodeId(node)
+        if (id instanceof Error) return reject(id)
+        if (this.state[id] === undefined) {
+          this.state[id] = {
+            activationValue: 100,
+            age: 0,
+            oldActivationValue: 0
+          }
+        } else {
+          this.state[id] = { activationValue: 100 }
         }
-      } else {
-        this.state[id] = { activationValue: 100 }
-      }
-      if (cb) return cb(null, this.state[id])
-      return this.state[id]
-    },
-
-    getActivationValue (node, cb) {
-      const id = this.getNodeId(node)
-      assert.ifError(id instanceof Error)
-      let activationValue = 0
-      if (!this.state[id]) {
-        activationValue = 0
-      } else {
-        activationValue = this.state[id].activationValue
-      }
-      if (cb) return cb(null, activationValue)
-      return activationValue
-    },
-
-    getOldActivationValue (node, cb) {
-      const id = this.getNodeId(node)
-      assert.ifError(id instanceof Error)
-      let oldActivationValue = 0
-      if (!this.state[id]) {
-        oldActivationValue = 0
-      } else {
-        oldActivationValue = this.state[id].oldActivationValue
-      }
-      if (cb) return cb(null, oldActivationValue)
-      return oldActivationValue
-    },
-
-    getMaximumActivationValue (filter, cb) {
-      if (!cb) {
-        cb = filter
-        filter = undefined
-      }
-      const avArray = this.state
-      .filter((state, id) => {
-        if (filter) return this.cn.node[id].type === filter
-        else return true
+        resolve(this.state[id])
       })
-      .map(state => state.activationValue)
-      const max = Math.max(...avArray, 0)
-      return cb(null, max)
     },
 
-    getActivatedTypedNodes (filter, threshold, cb) {
-      if (!cb) {
-        if (typeof threshold === 'function') {
-          cb = threshold
-          threshold = undefined
+    getActivationValue (node) {
+      return new Promise((resolve, reject) => {
+        const id = this.getNodeId(node)
+        if (id instanceof Error) return reject(id)
+        let activationValue = 0
+        if (!this.state[id]) {
+          activationValue = 0
+        } else {
+          activationValue = this.state[id].activationValue
         }
-        if (typeof filter === 'function') {
-          cb = filter
-          filter = undefined
-        }
-      }
-      if (threshold === undefined) threshold = 90
-      if (typeof filter !== 'string') filter = ''
-
-      const activatedTypedNodes = this.state
-      .map((state, id) => {
-        return {
-          node: this.cn.node[id],
-          activationValue: this.state[id].activationValue
-        }
+        resolve(activationValue)
       })
-      .filter((e) => {
-        if (filter) return e.node.type === filter
-        else return true
-      })
-      .filter((e) => e.activationValue >= threshold)
-      return cb(null, activatedTypedNodes)
     },
 
-    setActivationValue (node, value, cb) {
-      const id = this.getNodeId(node)
-      assert.ifError(id instanceof Error)
-      if (!this.state[id]) {
-        this.state[id] = {
-          activationValue: value,
-          age: 0,
-          oldActivationValue: 0
+    getOldActivationValue (node) {
+      return new Promise((resolve, reject) => {
+        const id = this.getNodeId(node)
+        if (id instanceof Error) return reject(id)
+        let oldActivationValue = 0
+        if (!this.state[id]) {
+          oldActivationValue = 0
+        } else {
+          oldActivationValue = this.state[id].oldActivationValue
         }
-      } else {
-        this.state[id].activationValue = value
-      }
-      // Reactivate non-activated nodes.
-      if (!value) {
-        delete this.state[id]
-      }
-      if (cb) return cb()
+        resolve(oldActivationValue)
+      })
+    },
+
+    getMaximumActivationValue (filter) {
+      return new Promise((resolve, reject) => {
+        const avArray = this.state
+        .filter((state, id) => {
+          if (filter) return this.cn.node[id].type === filter
+          else return true
+        })
+        .map(state => state.activationValue)
+        const max = Math.max(...avArray, 0)
+        resolve(max)
+      })
+    },
+
+    getActivatedTypedNodes (filter = '', threshold = 90) {
+      return new Promise((resolve, reject) => {
+        const activatedTypedNodes = this.state
+        .map((state, id) => {
+          return {
+            node: this.cn.node[id],
+            activationValue: this.state[id].activationValue
+          }
+        })
+        .filter((e) => {
+          if (filter) return e.node.type === filter
+          else return true
+        })
+        .filter((e) => e.activationValue >= threshold)
+        resolve(activatedTypedNodes)
+      })
+    },
+
+    setActivationValue (node, value) {
+      return new Promise((resolve, reject) => {
+        const id = this.getNodeId(node)
+        if (id instanceof Error) return reject(id)
+        if (!this.state[id]) {
+          this.state[id] = {
+            activationValue: value,
+            age: 0,
+            oldActivationValue: 0
+          }
+        } else {
+          this.state[id].activationValue = value
+        }
+        // Reactivate non-activated nodes.
+        if (!value) {
+          delete this.state[id]
+        }
+        resolve(this.state[id])
+      })
     },
 
     normalNumberComingLinks: 2,
 
-    propagate (options, cb) {
-      // Parameters
-      if (!cb && typeof options === 'function') {
-        cb = options
-        options = {
-          decay: 40,
-          memoryPerf: 100
-        }
-      }
-      if (options && typeof options !== 'object') {
-        return cb(new Error('propagate() parameter should be an object'))
-      }
-
-      // Aging
-      this.state = this.state.map(state => {
-        state.oldActivationValue = state.activationValue
-        state.age++
-        return state
-      })
-
-      // Compute influences
-      const influenceNb = []    // nodeId -> number of influences
-      const influenceValue = [] // nodeId -> total of influences
-      this.cn.node.forEach((node, nodeId, nodes) => {
-        const ov = this.getOldActivationValue(node)
-        const outgoingLinks = this.cn.getNodeFromLinks(nodeId)
-        outgoingLinks.forEach((linkId) => {
-          const link = this.cn.getLink(linkId)
-          const nodeToId = link.toId
-          let infl = influenceValue[nodeToId] || 0
-          infl += 0.5 + ov * link.coOcc
-          influenceValue[nodeToId] = infl
-          influenceNb[nodeToId] = influenceNb[nodeToId] || 0
-          influenceNb[nodeToId] += 1
+    computeInfluence () {
+      return new Promise((resolve, reject) => {
+        const influenceNb = []    // nodeId -> number of influences
+        const influenceValue = [] // nodeId -> total of influences
+        this.cn.node.forEach((node, nodeId, nodes) => {
+          this.getOldActivationValue(node)
+          .then(ov => {
+            const outgoingLinks = this.cn.getNodeFromLinks(nodeId)
+            outgoingLinks.forEach((linkId) => {
+              const link = this.cn.getLink(linkId)
+              const nodeToId = link.toId
+              let infl = influenceValue[nodeToId] || 0
+              infl += 0.5 + ov * link.coOcc
+              influenceValue[nodeToId] = infl
+              influenceNb[nodeToId] = influenceNb[nodeToId] || 0
+              influenceNb[nodeToId] += 1
+            })
+          })
+          .catch(err => {
+            reject(err)
+          })
         })
+        resolve({influenceNb, influenceValue})
       })
+    },
 
-      this.cn.node.forEach((node, id) => {
-        let state = this.state[id]
-        if (state === undefined) {
-          state = { activationValue: 0, oldActivationValue: 0, age: 0 }
+    propagate (options = { decay: 40, memoryPerf: 100 }) {
+      return new Promise((resolve, reject) => {
+        if (options && typeof options !== 'object') {
+          return reject(new Error('propagate() parameter should be an object'))
         }
-        const decay = options.decay || 40
-        const memoryPerf = options.memoryPerf || 100
-        const minusAge = 200 / (1 + Math.exp(-state.age / memoryPerf)) - 100
-        let newActivationValue
 
-        if (!influenceValue[id]) {
-          // If this node is not influenced at all
-          newActivationValue = state.oldActivationValue -
-                               decay * state.oldActivationValue / 100 - minusAge
-        } else {
-          // If this node receives influence
-          let influence = influenceValue[id]
-          const nbIncomings = influenceNb[id]
-          influence /= Math.log(this.normalNumberComingLinks + nbIncomings) /
-                       Math.log(this.normalNumberComingLinks)
-          newActivationValue = state.oldActivationValue -
-                               decay * state.oldActivationValue / 100 +
-                               influence -
-                               minusAge
-        }
-        newActivationValue = Math.max(newActivationValue, 0)
-        newActivationValue = Math.min(newActivationValue, 100)
-        this.setActivationValue(id, newActivationValue)
-      })
-      return cb()
-    }
+        // Aging
+        this.state = this.state.map(state => {
+          state.oldActivationValue = state.activationValue
+          state.age++
+          return state
+        })
+
+        this.computeInfluence()
+        .then(({influenceNb, influenceValue}) => {
+          this.cn.node.forEach((node, id) => {
+            let state = this.state[id]
+            if (state === undefined) {
+              state = { activationValue: 0, oldActivationValue: 0, age: 0 }
+            }
+            const decay = options.decay || 40
+            const memoryPerf = options.memoryPerf || 100
+            const minusAge = 200 / (1 + Math.exp(-state.age / memoryPerf)) - 100
+            let newActivationValue
+
+            if (!influenceValue[id]) {
+              // If this node is not influenced at all
+              newActivationValue = state.oldActivationValue -
+                                   decay * state.oldActivationValue / 100 - minusAge
+            } else {
+              // If this node receives influence
+              let influence = influenceValue[id]
+              const nbIncomings = influenceNb[id]
+              influence /= Math.log(this.normalNumberComingLinks + nbIncomings) /
+                           Math.log(this.normalNumberComingLinks)
+              newActivationValue = state.oldActivationValue -
+                                   decay * state.oldActivationValue / 100 +
+                                   influence -
+                                   minusAge
+            }
+            newActivationValue = Math.max(newActivationValue, 0)
+            newActivationValue = Math.min(newActivationValue, 100)
+            this.setActivationValue(id, newActivationValue)
+          })
+          return resolve()
+        })
+        .catch(err => reject(err))
+      }) // Promise
+    } // propagate
   }
 
   return cns
