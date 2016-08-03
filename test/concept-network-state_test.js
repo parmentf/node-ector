@@ -5,7 +5,6 @@
 
 // ## Required libraries
 var debug = require('debug')('ector:concept-network-state:test') // eslint-disable-line no-unused-vars
-const assert = require('assert')
 const chai = require('chai')
 const expect = chai.expect
 
@@ -66,7 +65,7 @@ describe('ConceptNetworkState', function () {
     it('should cap the activation of an activated node', function () {
       return cns.activate(node1.id)
       .then(state => {
-        assert.equal(cns.state[node1.id].activationValue, 100)
+        expect(cns.state[node1.id].activationValue).to.be.equal(100)
       })
     })
   })
@@ -97,14 +96,14 @@ describe('ConceptNetworkState', function () {
       it('should get a zero activation value', function () {
         return cns.getActivationValue(node2.id)
         .then(activationValue => {
-          assert.deepEqual(activationValue, 0)
+          expect(activationValue).to.be.equal(0)
         })
       })
 
       it('should get a 100 activation value', function () {
         return cns.getActivationValue(node1.id)
         .then(activationValue => {
-          assert.deepEqual(activationValue, 100)
+          expect(activationValue).to.be.equal(100)
         })
       })
 
@@ -145,14 +144,14 @@ describe('ConceptNetworkState', function () {
       it('should get a zero activation value', function () {
         return cns.getOldActivationValue(node2.id)
         .then(oldActivationValue => {
-          assert.deepEqual(oldActivationValue, 0)
+          expect(oldActivationValue).to.be.equal(0)
         })
       })
 
       it('should get a 100 activation value', function () {
         return cns.getOldActivationValue(node1.id)
         .then(oldActivationValue => {
-          assert.deepEqual(oldActivationValue, 100)
+          expect(oldActivationValue).to.be.equal(100)
         })
       })
     })
@@ -178,12 +177,11 @@ describe('ConceptNetworkState', function () {
       it('should return 0 when no node is activated', function () {
         return cns.getMaximumActivationValue()
         .then(maxValue => {
-          assert.equal(maxValue, 0)
+          expect(maxValue).to.be.equal(0)
         })
       })
 
-      it('should get the maximum activation value for any token',
-        function () {
+      it('should get the maximum activation value for any token', function () {
         return cns.setActivationValue(node1.id, 75)
         .then(() => {
           return cns.setActivationValue(node2.id, 70)
@@ -195,12 +193,11 @@ describe('ConceptNetworkState', function () {
           return cns.getMaximumActivationValue()
         })
         .then(maxValue => {
-          assert.equal(maxValue, 75)
+          expect(maxValue).to.be.equal(75)
         })
       })
 
-      it('should get the maximum activation value for s tokens',
-        function () {
+      it('should get the maximum activation value for s tokens', function () {
         return cns.setActivationValue(node1.id, 75)
         .then(() => {
           return cns.setActivationValue(node2.id, 70)
@@ -212,7 +209,7 @@ describe('ConceptNetworkState', function () {
           return cns.getMaximumActivationValue('s')
         })
         .then(maxValue => {
-          assert.equal(maxValue, 70)
+          expect(maxValue).to.be.equal(70)
         })
       })
     })
@@ -329,7 +326,7 @@ describe('ConceptNetworkState', function () {
           return cns.getActivationValue(node2.id)
         })
         .then(activationValue => {
-          assert.deepEqual(activationValue, 0)
+          expect(activationValue).to.be.equal(0)
         })
       })
 
@@ -339,7 +336,7 @@ describe('ConceptNetworkState', function () {
           return cns.getActivationValue(node1.id)
         })
         .then(activationValue => {
-          assert.deepEqual(activationValue, 75)
+          expect(activationValue).to.be.equal(75)
         })
       })
     })
@@ -392,8 +389,11 @@ describe('ConceptNetworkState', function () {
     it('should take decay into account', function () {
       return cns.propagate({decay: 200})
       .then(() => {
+        const array = [1, 2]
+        delete array[0]
+        delete array[1]
         expect(cns.state).to.be.an('array')
-        expect(cns.state).to.be.deep.equal([,], 'all nodes should be deactivated')
+        expect(cns.state).to.be.deep.equal(array, 'all nodes should be deactivated')
       })
     })
 
