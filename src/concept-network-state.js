@@ -126,9 +126,43 @@ export function ConceptNetworkState (conceptNetwork) {
     normalNumberComingLinks: 2,
 
     computeInfluence () {
+      // What a mess!! Maybe read http://exploringjs.com/es6/ch_promises.html
       return new Promise((resolve, reject) => {
         const influenceNb = []    // nodeId -> number of influences
         const influenceValue = [] // nodeId -> total of influences
+        const promise = this.cn.node.reduce((sequence, node, nodeId) => {
+          return sequence.then(() => {
+            let ov  // acrobatic
+            this.getOldActivationValue(node)
+            .then(oav => {
+              ov = oav // acrobatic
+              return this.cn.getNodeFromLinks(nodeId)
+            })
+            .then(outgoingLinks => {
+              return outgoingLinks.reduce((sequence, linkId) => {
+                return sequence.then(() => {
+                  this.cn.getLink(linkId)
+                  .then(link => {
+                    debug('link', link)
+                    debug('ov', ov)
+                    const nodeToId = link.toId
+                    let infl = influenceValue[nodeToId] || 0
+                    infl += 0.5 + ov * link.coOcc
+                    influenceValue[nodeToId] = infl
+                    influenceNb[nodeToId] = influenceNb[nodeToId] || 0
+                    influenceNb[nodeToId] += 1
+                    debug('infl', infl)
+                    debug('influenceValue 1', influenceValue)
+                  })
+                })
+              }, Promise.resolve())
+            })
+
+          })
+        }, Promise.resolve())
+        .then(() => resolve({ influenceNb, influenceValue }))
+        return promise
+/*
         this.cn.node.forEach((node, nodeId, nodes) => {
           this.getOldActivationValue(node)
           .then(ov => {
@@ -148,6 +182,7 @@ export function ConceptNetworkState (conceptNetwork) {
           })
         })
         resolve({influenceNb, influenceValue})
+*/
       })
     },
 
@@ -166,6 +201,8 @@ export function ConceptNetworkState (conceptNetwork) {
 
         this.computeInfluence()
         .then(({influenceNb, influenceValue}) => {
+          debug('influenceNb 2', influenceNb)
+          debug('influenceValue 2', influenceValue)
           this.cn.node.forEach((node, id) => {
             let state = this.state[id]
             if (state === undefined) {

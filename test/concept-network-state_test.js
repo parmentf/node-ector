@@ -334,7 +334,7 @@ describe('ConceptNetworkState', function () {
 
   describe('#propagate', function () {
     var cn, cns, node1, node2
-    before(function (done) {
+    before(function () {
       cn = ConceptNetwork()
       cns = ConceptNetworkState(cn)
       cn.addNode({ label: 'Node 1' })
@@ -344,9 +344,8 @@ describe('ConceptNetworkState', function () {
       })
       .then(node => {
         node2 = node
-        cn.addLink(node1.id, node2.id, done)
+        return cn.addLink(node1.id, node2.id)
       })
-      .catch(err => done(err))
     })
 
     it('should deactivate node without afferent links', function () {
@@ -367,6 +366,7 @@ describe('ConceptNetworkState', function () {
     })
 
     it('should activate node 2', function () {
+      debug('cns.state', cns.state)
       return cns.getActivationValue(node2.id)
       .then(value => {
         expect(value).to.be.above(0)
@@ -411,22 +411,19 @@ describe('ConceptNetworkState', function () {
       })
     })
 
-    it('should use already existing influenceValue', function (done) {
+    it('should use already existing influenceValue', function () {
       var node3
       cn.addNode({ label: 'Node 3' })
       .then(node => {
         node3 = node
-        cn.addLink(node3.id, node2.id, function (err) {
-          if (err) return done(err)
-          cns.activate(node1.id)
-          .then(state => {
-            return cns.propagate()
-          })
-          .then(() => done())
-          .catch(err => done(err))
-        })
+        return cn.addLink(node3.id, node2.id)
       })
-      .catch(err => done(err))
+      .then(link => {
+        return cns.activate(node1.id)
+      })
+      .then(state => {
+        return cns.propagate()
+      })
     })
   })
 })

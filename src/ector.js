@@ -47,6 +47,24 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
 
     lastSentenceNodeId: null,
 
+    createTokens (sentence, index, tokenizer) {
+      const tokens = tokenizer.getTokens(index)
+      return tokens.reduce((sequence, token, index) => {
+        return this.cn.getNode({label: token, type: 'w'})
+        .then((oldToken = { beg: 0, mid: 0, end: 0 }) => {
+          const tokenObject = {
+            label: token,
+            type: 'w',
+            beg: oldToken.beg + (index === 0 ? 1 : 0),
+            mid: oldToken.mid + (index !== 0 && index < tokens.length - 1 ? 1 : 0),
+            end: oldToken.end + (index === tokens.length - 1 ? 1 : 0)
+          }
+          return new Promise((resolve, reject) => resolve(tokenObject))
+        })
+      }, Promise.resolve())
+      // returns a Promise(tokensObjects)
+    },
+
     addEntry (entry, cns = this.cns[this.user]) {
       return new Promise((resolve, reject) => {
         if (typeof entry !== 'string') {
@@ -72,6 +90,22 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
           this.lastSentenceNodeId = sentencesNodes[sentencesNodes.length - 1].id
           sentencesNodes.forEach((sentence, index) => {
             cns.activate(sentence)
+            .then(state => {
+              return this.createTokens(sentence, index, tokenizer)
+            })
+            .then(tokensObjects => this.cn.addNodes(tokensObjects))
+            .then(tokensNodes => {
+              for (let i = 0; i < tokensNodes.length; i++) {
+                if (i < tokensNodes.length - 1) {
+                  this.cn.addLink(tokensNodes[i].id, tokensNodes[i + 1].id)
+                }
+                this.cn.addLink(sentencesNodes[index].id, tokensNodes[i].id)
+                cns.activate(tokensNodes[i])
+              }
+
+              allTokenNodes = [...allTokenNodes, ...tokensNodes]
+            })
+/*
             const tokens = tokenizer.getTokens(index)
             const tokensObjects = tokens.map((token, index, array) => {
               const oldToken = this.cn.getNode({label: token, type: 'w'}) ||
@@ -96,6 +130,7 @@ export function Ector (name = 'ECTOR', username = 'Guy') {
             }
 
             allTokenNodes = [...allTokenNodes, ...tokensNodes]
+*/
           })
           return resolve(allTokenNodes)
         })

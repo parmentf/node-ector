@@ -1,5 +1,4 @@
 import 'babel-polyfill'
-import assert from 'assert'
 import Debug from 'debug'
 const debug = Debug('ector:concept-network') // eslint-disable-line no-unused-vars
 
@@ -19,200 +18,196 @@ export function ConceptNetwork () {
           node.id = this.node.length
           this.nodeIndex[type + label] = node
           this.node.push(node)
+          return resolve(node)
         } else {
-          const node2 = this.getNode({label, type})
-          node2.beg += node.beg > 0 ? 1 : 0
-          node2.mid += node.mid > 0 ? 1 : 0
-          node2.end += node.end > 0 ? 1 : 0
-          node2.occ += inc
-          node = node2
+          this.getNode({label, type})
+          .then(node2 => {
+            node2.beg += node.beg > 0 ? 1 : 0
+            node2.mid += node.mid > 0 ? 1 : 0
+            node2.end += node.end > 0 ? 1 : 0
+            node2.occ += inc
+            return resolve(node2)
+          })
         }
-        return resolve(node)
       })
     },
 
-    getNode ({label, type = ''}, cb) {
-      if (cb) {
-        return cb(null, this.nodeIndex[type + label])
-      }
-      return this.nodeIndex[type + label]
-    },
-
-    getNodeById (id, cb) {
-      if (cb) {
-        return this.node.find(node => node.id === id)
-      }
-      return this.node.find(node => node.id === id)
-    },
-
-    addNodes (nodes, cb) {
-      const res = nodes.map(node => {
-        this.addNode(node)
-        return this.getNode(node)
+    getNode ({label, type = ''}) {
+      return new Promise((resolve, reject) => {
+        return resolve(this.nodeIndex[type + label])
       })
-      if (cb) {
-        return cb(null, res)
-      }
-      return res
     },
 
-    addLink (fromId, toId, inc, cb) {
-      if (!cb) {
-        cb = inc
-        inc = 1
-      } else {
-        inc = inc || 1
-      }
-      if (cb) {
-        if (typeof fromId !== 'number') {
-          return cb(new Error('fromId should be a number'), null)
+    getNodeById (id) {
+      return new Promise((resolve, reject) => resolve(this.node.find(node => node.id === id)))
+    },
+
+    addNodes (objects) {
+      // See http://www.html5rocks.com/en/tutorials/es6/promises/#toc-creating-sequences
+      const nodes = []
+      const promise = objects.reduce((sequence, object) => {
+        return sequence.then(() => {
+          return this.addNode(object)
+        })
+        .then(node => {
+          nodes.push(node)
+        })
+      }, Promise.resolve())
+      .then(() => nodes)
+      return promise
+    },
+
+    addLink (fromId, toId, inc = 1) {
+      return new Promise((resolve, reject) => {
+        if (typeof fromId !== 'number') return reject(new Error('fromId should be a number'))
+        if (typeof toId !== 'number') return reject(new Error('toId should be a number'))
+        if (fromId === undefined) return reject(new Error('fromId should be defined'))
+        if (fromId === null) return reject(new Error('fromId should not be null'))
+        if (toId === undefined) return reject(new Error('toId should be defined'))
+        if (toId === null) return reject(new Error('fromId should not be null'))
+
+        this.getLink(fromId, toId)
+        .then(link => {
+          const linkId = fromId + '_' + toId
+          if (link) {
+            link.coOcc += inc
+          } else {
+            this.link[linkId] = link = {
+              fromId,
+              toId,
+              coOcc: inc
+            }
+          }
+
+          if (!this.fromIndex[fromId]) {
+            this.fromIndex[fromId] = new Set()
+          }
+          this.fromIndex[fromId].add(linkId)
+          if (!this.toIndex[toId]) {
+            this.toIndex[toId] = new Set()
+          }
+          this.toIndex[toId].add(linkId)
+
+          return resolve(link)
+        })
+      })
+    },
+
+    getLink (fromId, toId) {
+      return new Promise((resolve, reject) => {
+        if (fromId === undefined) return reject(new Error('fromId should be defined'))
+        let linkId
+        if (typeof fromId === 'string') {
+          linkId = fromId
+          let [fId, tId] = linkId.split('_').map(str => Number(str))
+          fromId = fId
+          toId = tId
+        } else {
+          linkId = fromId + '_' + toId
         }
-        if (typeof toId !== 'number') {
-          return cb(new Error('toId should be a number'), null)
+        if (typeof fromId !== 'number') return reject(new Error('fromId should be a number'))
+        if (toId === undefined) return reject(new Error('toId should be defined'))
+        if (typeof toId !== 'number') return reject(new Error('toId should be a number'))
+        return resolve(this.link[linkId])
+      })
+    },
+
+    getNodeFromLinks (fromId) {
+      return new Promise((resolve, reject) => {
+        const fromLinksSet = this.fromIndex[fromId]
+        if (!fromLinksSet) {
+          return resolve([])
         }
-      }
-      assert(typeof fromId, 'number')
-      assert(typeof toId, 'number')
-      assert(fromId !== undefined, 'fromId should be defined')
-      assert(fromId !== null, 'fromId should not be null')
-      assert(toId !== undefined, 'toId should be defined')
-      assert(toId !== null, 'fromId should not be null')
-      let link = this.getLink(fromId, toId)
-      const linkId = fromId + '_' + toId
-      if (link) {
-        link.coOcc += inc
-      } else {
-        this.link[linkId] = link = {
-          fromId,
-          toId,
-          coOcc: inc
+        const fromLinks = Array.from(fromLinksSet.values())
+        return resolve(fromLinks)
+      })
+    },
+
+    getNodeToLinks (toId) {
+      return new Promise((resolve, reject) => {
+        const toLinksSet = this.toIndex[toId]
+        if (!toLinksSet) {
+          return resolve([])
         }
-      }
-
-      if (!this.fromIndex[fromId]) {
-        this.fromIndex[fromId] = new Set()
-      }
-      this.fromIndex[fromId].add(linkId)
-      if (!this.toIndex[toId]) {
-        this.toIndex[toId] = new Set()
-      }
-      this.toIndex[toId].add(linkId)
-
-      if (cb) {
-        return cb(null, link)
-      }
-      return link
+        const toLinks = Array.from(toLinksSet.values())
+        return resolve(toLinks)
+      })
     },
 
-    getLink (fromId, toId, cb) {
-      assert(fromId !== undefined, 'fromId should be defined')
-      assert(typeof fromId, 'number')
-      let linkId
-      if (typeof fromId === 'string') {
-        linkId = fromId
-        cb = toId
-        let [fId, tId] = linkId.split('_').map(str => Number(str))
-        fromId = fId
-        toId = tId
-      } else {
-        linkId = fromId + '_' + toId
-      }
-      assert(toId !== undefined, 'toId should be defined')
-      assert(typeof toId, 'number')
-      if (cb) {
-        return cb(null, this.link[linkId])
-      }
-      return this.link[linkId]
-    },
-
-    getNodeFromLinks (fromId, cb) {
-      const fromLinksSet = this.fromIndex[fromId]
-      if (!fromLinksSet) {
-        if (cb) return cb(null, [])
-        return []
-      }
-      const fromLinks = Array.from(fromLinksSet.values())
-      if (cb) {
-        return cb(null, fromLinks)
-      }
-      return fromLinks
-    },
-
-    getNodeToLinks (toId, cb) {
-      const toLinksSet = this.toIndex[toId]
-      if (!toLinksSet) {
-        if (cb) cb(null, [])
-        return []
-      }
-      const toLinks = Array.from(toLinksSet.values())
-      if (cb) {
-        return cb(null, toLinks)
-      }
-      return toLinks
-    },
-
-    removeLink (fromId, toId, cb) {
-      let linkId
-      if (typeof fromId === 'string') {
-        linkId = fromId
-        cb = toId
-        let [fId, tId] = linkId.split('_').map(str => Number(str))
-        fromId = fId
-        toId = tId
-      } else {
-        linkId = fromId + '_' + toId
-      }
-      delete this.link[linkId]
-      this.fromIndex[fromId] && this.fromIndex[fromId].delete(linkId)
-      this.toIndex[toId] && this.toIndex[toId].delete(linkId)
-      if (cb) return cb()
+    removeLink (fromId, toId) {
+      return new Promise((resolve, reject) => {
+        let linkId
+        if (typeof fromId === 'string') {
+          linkId = fromId
+          let [fId, tId] = linkId.split('_').map(str => Number(str))
+          fromId = fId
+          toId = tId
+        } else {
+          linkId = fromId + '_' + toId
+        }
+        delete this.link[linkId]
+        this.fromIndex[fromId] && this.fromIndex[fromId].delete(linkId)
+        this.toIndex[toId] && this.toIndex[toId].delete(linkId)
+        return resolve()
+      })
     },
 
     decrementLink (linkId, cb) {
-      const link = this.link[linkId]
-      link.coOcc -= 1
-      if (link.coOcc === 0) {
-        if (cb) return this.removeLink(linkId, cb)
-        return this.removeLink(linkId)
-      }
-      if (cb) return cb(null, link)
-      return link
+      return new Promise((resolve, reject) => {
+        const link = this.link[linkId]
+        link.coOcc -= 1
+        if (link.coOcc === 0) {
+          this.removeLink(linkId)
+          .then(() => {
+            resolve()
+          })
+          .catch(err => reject(err))
+        }
+        return resolve(link)
+      })
     },
 
-    decrementNode (node, cb) {
-      let n = this.getNode(node)
-      if (!n) {
-        if (cb) {
-          return cb(null, null)
-        }
-        return null
-      }
-      n.occ--
-      if (n.occ === 0) {
-        this.removeNode(node.id)
-        n = null
-      }
-      if (cb) {
-        return cb(null, n)
-      }
-      return n
+    decrementNode (node) {
+      return new Promise((resolve, reject) => {
+        this.getNode(node)
+        .then(n => {
+          if (!n) {
+            return resolve(null)
+          }
+          n.occ--
+          if (n.occ === 0) {
+            this.removeNode(node.id)
+            n = null
+            return resolve(n)
+          } else return resolve(n)
+        })
+      })
     },
 
     removeNode (id, cb) {
-      const fromLinksSet = this.fromIndex[id]
-      if (fromLinksSet) {
-        for (let linkId of fromLinksSet) {
-          this.removeLink(linkId)
+      return new Promise((resolve, reject) => {
+        const fromLinksSet = this.fromIndex[id]
+        let fromLinks = []
+        if (fromLinksSet) {
+          fromLinks = Array.from(fromLinksSet)
         }
-      }
-      const toLinksSet = this.toIndex[id]
-      if (toLinksSet) {
-        for (let linkId of toLinksSet) {
-          this.removeLink(linkId)
+
+        const toLinksSet = this.toIndex[id]
+        let toLinks = []
+        if (toLinksSet) {
+          toLinks = Array.from(toLinksSet)
         }
-      }
-      delete this.node[id]
-      if (cb) return cb()
+        const linksToRemove = [...fromLinks, ...toLinks]
+        linksToRemove.reduce((sequence, link) => {
+          return sequence.then(() => {
+            return this.removeLink(link)
+          })
+        }, Promise.resolve())
+        .then(() => {
+          delete this.node[id]
+          resolve()
+        })
+      })
     }
   }
 

@@ -139,20 +139,20 @@ describe('Bot', function () {
   })
 
   describe('Add an entry', function () {
-    describe('in the Concept Network', function () {
+    describe('in the Concept Network', function (done) {
       it('should return an error when entry is empty', function () {
         const ector = Ector()
         ector.addEntry('')
-        .then(nodes => {
-          expect(nodes).to.be.an('error')
+        .catch(() => {
+          done()
         })
       })
 
-      it('should return an error when entry is not a string', function () {
+      it('should return an error when entry is not a string', function (done) {
         var ector = Ector()
         ector.addEntry()
-        .then(nodes => {
-          expect(nodes).to.be.an('error')
+        .catch(() => {
+          done()
         })
       })
 
@@ -371,7 +371,7 @@ describe('Bot', function () {
       return ector.addEntry('Hello ECTOR and ECTOR.')
       .then(nodes => {
         var response = ector.generateResponse()
-        expect(response.sentence).to.be.equal( 'Hello Guy and Guy.')
+        expect(response.sentence).to.be.equal('Hello Guy and Guy.')
       })
     })
   })

@@ -99,34 +99,76 @@ describe('ConceptNetwork', function () {
 
   // ### decrementNode
   describe('decrementNode', function () {
-    it('should decrement a node with occ of 3', function (done) {
-      cn.decrementNode({ label: 'Chuck Norris' }, function (err, node) {
+    it('should decrement a node with occ of 3', function () {
+      return cn.decrementNode({ label: 'Chuck Norris' })
+      .then(node => {
         expect(node.id).to.be.equal(0)
         expect(node.occ).to.be.equal(2)
-        done(err)
       })
     })
 
-    it('should remove a node with an occ of 1', function (done) {
-      cn.decrementNode({ label: 'World' }, function (err, node) {
+    it('should remove a node with an occ of 1', function () {
+      return cn.decrementNode({ label: 'World' })
+      .then(node => {
         expect(node).to.be.null
-        done(err)
       })
     })
 
-    it('should return null when node does not exist', function (done) {
-      cn.decrementNode({ label: 'unexisting' }, function (err, node) {
+    it('should return null when node does not exist', function () {
+      return cn.decrementNode({ label: 'unexisting' })
+      .then(node => {
         expect(node).to.be.null
-        done(err)
+      })
+    })
+  })
+
+  // ### addNodes
+  describe('addNodes', () => {
+    beforeEach(() => {
+      cn = ConceptNetwork()
+    })
+
+    it('should return an array', () => {
+      return cn.addNodes([
+        { label: 'node1' },
+        { label: 'node2' }
+      ])
+      .then(nodes => {
+        expect(nodes).to.be.an('array')
+      })
+    })
+
+    it('should return a good-sized array', () => {
+      return cn.addNodes([
+        { label: 'node1' },
+        { label: 'node2' }
+      ])
+      .then(nodes => {
+        expect(nodes).to.be.lengthOf(2)
+      })
+    })
+
+    it('should return nodes', () => {
+      return cn.addNodes([
+        { label: 'node1' },
+        { label: 'node2' }
+      ])
+      .then(nodes => {
+        expect(nodes[0]).to.have.property('label')
+        expect(nodes[0]).to.have.property('id')
+        expect(nodes[0].id).to.be.equal(0)
+        expect(nodes[1]).to.have.property('label')
+        expect(nodes[1]).to.have.property('id')
+        expect(nodes[1].id).to.be.equal(1)
       })
     })
   })
 
   // ### removeNode
   describe('removeNode', function () {
-    beforeEach(function (done) {
+    beforeEach(function () {
       cn = ConceptNetwork()
-      cn.addNode({ label: 'Node 1' })
+      return cn.addNode({ label: 'Node 1' })
       .then(node1 => {
         node1.occ = 2
         return cn.addNode({ label: 'Node 2' })
@@ -138,35 +180,32 @@ describe('ConceptNetwork', function () {
         return cn.addNode({ label: 'Node 4' })
       })
       .then(node4 => {
-        cn.addLink(2, 3, function (err5, link23) {
-          if (err5) return done(err5)
-          cn.addLink(3, 4, function (err6, link34) {
-            done(err6)
-          })
-        })
+        return cn.addLink(1, 2)
       })
-      .catch(err => done(err))
+      .then(link23 => {
+        return cn.addLink(2, 3)
+      })
     })
 
-    it('should remove even a node with occ value of 2', function (done) {
+    it('should remove even a node with occ value of 2', function () {
       expect(cn.node[0].occ).to.be.equal(2)
-      cn.removeNode(cn.node[0].id, function (err) {
+      return cn.removeNode(cn.node[0].id)
+      .then(() => {
         expect(cn.node[0]).to.be.undefined
-        done(err)
       })
     })
 
-    it('should remove the links from the removed node', function (done) {
-      cn.removeNode(2, function (err) {
+    it('should remove the links from the removed node', function () {
+      return cn.removeNode(2)
+      .then(() => {
         expect(cn.link['2_3']).to.be.undefined
-        done(err)
       })
     })
 
-    it('should remove the links to the removed node', function (done) {
-      cn.removeNode(4, function (err) {
+    it('should remove the links to the removed node', function () {
+      return cn.removeNode(4)
+      .then(() => {
         expect(cn.link['3_4']).to.be.undefined
-        done(err)
       })
     })
   })
@@ -183,229 +222,226 @@ describe('ConceptNetwork', function () {
       })
     })
 
-    it('should return an object', function (done) {
-      cn.addLink(1, 2, function (err, link) {
+    it('should return an object', function () {
+      return cn.addLink(1, 2)
+      .then(link => {
         expect(link).to.be.an('object')
         expect(link.coOcc).to.be.equal(1)
-        done(err)
       })
     })
 
-    it('should increment coOcc', function (done) {
-      cn.addLink(1, 2, function (err, link) {
+    it('should increment coOcc', function () {
+      return cn.addLink(1, 2)
+      .then(link => {
         expect(link.coOcc).to.be.equal(2)
-        done(err)
       })
     })
 
-    it('should increment with more than 1', function (done) {
-      cn.addLink(1, 2, 4, function (err, link) {
+    it('should increment with more than 1', function () {
+      return cn.addLink(1, 2, 4)
+      .then(link => {
         expect(link.coOcc).to.be.equal(6)
-        done(err)
       })
     })
 
-    it('should create a good fromIndex', function (done) {
-      cn.addLink(1, 3, function (err, link) {
+    it('should create a good fromIndex', function () {
+      return cn.addLink(1, 3)
+      .then(link => {
         expect(Array.from(cn.fromIndex[1].values())).to.be.deep.equal(['1_2', '1_3'])
-        done(err)
       })
     })
 
     it('should not accept non number ids', function (done) {
-      cn.addLink(1, 'berf', function (err, link) {
+      cn.addLink(1, 'berf')
+      .then(link => {
+      })
+      .catch(err => {
         expect(err).to.be.an('error')
-        cn.addLink('barf', 2, function (err, link) {
-          expect(err).to.be.an('error')
-          done()
-        })
+      })
+      .then(() => {
+        return cn.addLink('barf', 2)
+      })
+      .catch(err => {
+        expect(err).to.be.an('error')
+        done()
       })
     })
 
-    it('should increment by 1 with a cb, without an inc', function (done) {
-      cn.addLink(1, 2, undefined, function (err, link) {
+    it('should increment by 1, without an inc', function () {
+      return cn.addLink(1, 2, undefined)
+      .then(link => {
         expect(link.coOcc).to.be.equal(7)
-        done(err)
       })
     })
   })
 
   describe('decrementLink', function () {
-    before(function (done) {
+    before(function () {
       cn = ConceptNetwork()
-      cn.addNode({ label: 'Node 1' })
-      .then(() => {
-        cn.addNode({ label: 'Node 2' })
-        .then(() => {
-          cn.addLink(1, 2, function (err) {
-            if (err) return done(err)
-            cn.addLink(1, 2, function (err) {
-              done(err)
-            })
-          })
-        })
+      return cn.addNode({ label: 'Node 1' })
+      .then(node1 => {
+        return cn.addNode({ label: 'Node 2' })
       })
-      .catch(err => done(err))
+      .then(node2 => {
+        return cn.addLink(1, 2)
+      })
+      .then(link => {
+        return cn.addLink(1, 2)
+      })
     })
 
-    it('should decrement a coOcc value of 2', function (done) {
+    it('should decrement a coOcc value of 2', function () {
       expect(cn.link['1_2'].coOcc).to.be.equal(2)
-      cn.decrementLink('1_2', function (err, link) {
+      return cn.decrementLink('1_2')
+      .then(link => {
         expect(cn.link['1_2'].coOcc).to.be.equal(1)
-        done(err)
       })
     })
 
-    it('should remove a link with a coOcc value of 0', function (done) {
+    it('should remove a link with a coOcc value of 0', function () {
       expect(cn.link['1_2'].coOcc).to.be.equal(1)
-      cn.decrementLink('1_2', function (err) {
+      return cn.decrementLink('1_2')
+      .then(() => {
         expect(cn.link['1_2']).to.be.undefined
-        done(err)
       })
     })
   })
 
   describe('removeLink', function () {
-    beforeEach(function (done) {
+    beforeEach(function () {
       cn = ConceptNetwork()
-      cn.addNode({ label: 'Node 1' })
+      return cn.addNode({ label: 'Node 1' })
       .then(() => {
-        cn.addNode({ label: 'Node 2' })
-        .then(() => {
-          cn.addLink(1, 2, function (err) {
-            done(err)
-          })
-        })
+        return cn.addNode({ label: 'Node 2' })
       })
-      .catch(err => done(err))
-    })
-
-    it('should remove the link', function (done) {
-      expect(cn.link['1_2']).to.be.deep.equal({ fromId: 1, toId: 2, coOcc: 1 })
-      cn.removeLink('1_2', function (err) {
-        expect(cn.link['1_2']).to.be.undefined
-        done(err)
+      .then(() => {
+        return cn.addLink(1, 2)
       })
     })
 
-    it('should remove the link, even with a toId', function (done) {
+    it('should remove the link', function () {
       expect(cn.link['1_2']).to.be.deep.equal({ fromId: 1, toId: 2, coOcc: 1 })
-      cn.removeLink(1, 2, function (err) {
+      return cn.removeLink('1_2')
+      .then(() => {
         expect(cn.link['1_2']).to.be.undefined
-        done(err)
+      })
+    })
+
+    it('should remove the link, even with a toId', function () {
+      expect(cn.link['1_2']).to.be.deep.equal({ fromId: 1, toId: 2, coOcc: 1 })
+      return cn.removeLink(1, 2)
+      .then(() => {
+        expect(cn.link['1_2']).to.be.undefined
       })
     })
   })
 
   describe('getters', function () {
-    before(function (done) {
+    before(function () {
       cn = ConceptNetwork()
-      cn.addNode({ label: 'Node 1' })
+      return cn.addNode({ label: 'Node 1' })
       .then(() => {
-        cn.addNode({ label: 'Node 2' })
-        .then(() => {
-          cn.addNode({ label: 'Node 3' })
-          .then(() => {
-            cn.addLink(1, 2, function (err) {
-              if (err) return done(err)
-              cn.addLink(1, 3, function (err) {
-                if (err) return done(err)
-                cn.addLink(2, 3, function (err) {
-                  done(err)
-                })
-              })
-            })
-          })
-        })
+        return cn.addNode({ label: 'Node 2' })
       })
-      .catch(err => done(err))
+      .then(() => {
+        return cn.addNode({ label: 'Node 3' })
+      })
+      .then(() => {
+        return cn.addLink(0, 1)
+      })
+      .then(() => {
+        return cn.addLink(0, 2)
+      })
+      .then(() => {
+        return cn.addLink(1, 2)
+      })
     })
 
     describe('getNode', function () {
-      it('should get the second node', function (done) {
-        cn.getNode({ label: 'Node 2' }, function (err, node) {
+      it('should get the second node', function () {
+        return cn.getNode({ label: 'Node 2' })
+        .then(node => {
           expect(node.id).to.be.equal(1)
-          done(err)
         })
       })
 
-      it('should return undefined when the node does not exist', function (done) {
-        cn.getNode({ label: 'Nonexistent' }, function (err, node) {
+      it('should return undefined when the node does not exist', function () {
+        return cn.getNode({ label: 'Nonexistent' })
+        .then(node => {
           expect(node).to.be.undefined
-          done(err)
         })
       })
     })
 
     describe('getLink', function () {
-      it('should get the link', function (done) {
-        cn.getLink('1_2', function (err, link) {
+      it('should get the link', function () {
+        return cn.getLink('1_2')
+        .then(link => {
           expect(link.fromId).to.be.equal(1)
           expect(link.toId).to.be.equal(2)
           expect(link.coOcc).to.be.equal(1)
-          done(err)
         })
       })
 
-      it('should get the link with two parameters', function (done) {
-        cn.getLink(1, 2, function (err, link) {
+      it('should get the link with two parameters', function () {
+        return cn.getLink(1, 2)
+        .then(link => {
           expect(link.fromId).to.be.equal(1)
           expect(link.toId).to.be.equal(2)
           expect(link.coOcc).to.be.equal(1)
-          done(err)
         })
       })
 
-      it('should return undefined when the node does not exist', function (done) {
-        cn.getLink(1, 100, function (err, link) {
+      it('should return undefined when the node does not exist', function () {
+        return cn.getLink(1, 100)
+        .then(link => {
           expect(link).to.be.undefined
-          done(err)
         })
       })
     })
 
     describe('getNodeFromLinks', function () {
-      it('should get all links from node 2', function (done) {
-        cn.getNodeFromLinks(2, function (err, fromLinks) {
-          expect(fromLinks).to.be.deep.equal(['2_3'])
-          done(err)
+      it('should get all links from node 2', function () {
+        return cn.getNodeFromLinks(1)
+        .then(fromLinks => {
+          expect(fromLinks).to.be.deep.equal(['1_2'])
         })
       })
 
-      it('should get all links from node 1', function (done) {
-        cn.getNodeFromLinks(1, function (err, fromLinks) {
-          expect(fromLinks).to.be.deep.equal(['1_2', '1_3'])
-          done(err)
+      it('should get all links from node 1', function () {
+        return cn.getNodeFromLinks(0)
+        .then(fromLinks => {
+          expect(fromLinks).to.be.deep.equal(['0_1', '0_2'])
         })
       })
 
-      it('should get no links from node 3', function (done) {
-        cn.getNodeFromLinks(3, function (err, fromLinks) {
+      it('should get no links from node 3', function () {
+        return cn.getNodeFromLinks(2)
+        .then(fromLinks => {
           expect(fromLinks).to.be.deep.equal([])
-          done(err)
         })
       })
     })
 
     describe('getNodeToLinks', function () {
-      it('should get all links to node 2', function (done) {
-        cn.getNodeToLinks(2, function (err, toLinks) {
-          expect(toLinks).to.be.deep.equal(['1_2'])
-          done(err)
+      it('should get all links to node 2', function () {
+        return cn.getNodeToLinks(1)
+        .then(toLinks => {
+          expect(toLinks).to.be.deep.equal(['0_1'])
         })
       })
 
-      it('should get all links to node 3', function (done) {
-        cn.getNodeToLinks(3, function (err, toLinks) {
-          expect(toLinks).to.be.deep.equal(['1_3', '2_3'])
-          done(err)
+      it('should get all links to node 3', function () {
+        return cn.getNodeToLinks(2)
+        .then(toLinks => {
+          expect(toLinks).to.be.deep.equal(['0_2', '1_2'])
         })
       })
 
-      it('should get no links to node 1', function (done) {
-        cn.getNodeToLinks(1, function (err, toLinks) {
+      it('should get no links to node 1', function () {
+        return cn.getNodeToLinks(0)
+        .then(toLinks => {
           expect(toLinks).to.be.deep.equal([])
-          done(err)
         })
       })
     })
