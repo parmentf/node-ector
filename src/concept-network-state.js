@@ -127,10 +127,12 @@ export function ConceptNetworkState (conceptNetwork) {
 
     computeInfluence () {
       // What a mess!! Maybe read http://exploringjs.com/es6/ch_promises.html
+      // See also https://pouchdb.com/2015/05/18/we-have-a-problem-with-promises.html
+      debug('computeInfluence')
       return new Promise((resolve, reject) => {
         const influenceNb = []    // nodeId -> number of influences
         const influenceValue = [] // nodeId -> total of influences
-        const promise = this.cn.node.reduce((sequence, node, nodeId) => {
+/*        const promise = this.cn.node.reduce((sequence, node, nodeId) => {
           return sequence.then(() => {
             let ov  // acrobatic
             this.getOldActivationValue(node)
@@ -162,8 +164,39 @@ export function ConceptNetworkState (conceptNetwork) {
         }, Promise.resolve())
         .then(() => resolve({ influenceNb, influenceValue }))
         return promise
-/*
-        this.cn.node.forEach((node, nodeId, nodes) => {
+*/
+        const promise = Promise.all(
+          this.cn.node.map(
+            node => this.getOldActivationValue(node)
+            .then(oldActivationValue => this.cn.getNodeFromLinks(node.id)
+              .then(outgoingLinks =>
+                Promise.all(
+                  outgoingLinks.map(
+                    linkId => this.getLink(linkId)
+                    .then(link => {
+                      debug('computeInfluence 1', link)
+                      return { value: 0.5 + oldActivationValue * link.coOcc,
+                               toId:           link.toId
+                      }
+                    })
+                  )
+                )
+                .then(influencesTo => {
+                  Promise.all(influencesTo.map(influence => {
+                    influenceValue[influence.toId] += influence.value
+                    influenceNb[influence.toId]    += 1
+                    debug('computeInfluence', influence.toId)
+                    return influence.toId
+                  }))
+                  .then(() => resolve({influenceNb, influenceValue}))
+                })
+              )
+            )
+          )
+        )
+
+        return promise
+/*        this.cn.node.forEach((node, nodeId, nodes) => {
           this.getOldActivationValue(node)
           .then(ov => {
             const outgoingLinks = this.cn.getNodeFromLinks(nodeId)
