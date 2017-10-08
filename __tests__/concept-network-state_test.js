@@ -1,6 +1,5 @@
 'use strict';
 
-// const ConceptNetwork = require('../lib/concept-network').ConceptNetwork;
 import { ConceptNetwork } from '../lib/concept-network';
 import { ConceptNetworkState } from '../lib/concept-network-state';
 
@@ -35,253 +34,167 @@ describe('ConceptNetworkState', () => {
     let cn = null;
     let cns = null;
     let node1 = null;
-    beforeAll(() => {
+    beforeAll(async () => {
       cn = ConceptNetwork();
       cns = ConceptNetworkState(cn);
-      return cn.addNode({ label: 'Node 1' }).then(node => {
-        node1 = node;
-      });
+      node1 = await cn.addNode({ label: 'Node 1' });
     });
 
-    it('should put the node activation to 100', () => {
-      return cns.activate(node1).then(state => {
-        expect(cns.state[node1.id].activationValue).toBe(100);
-      });
+    it('should put the node activation to 100', async () => {
+      await cns.activate(node1);
+      expect(cns.state[node1.id].activationValue).toBe(100);
     });
 
-    it('should cap the activation of an activated node', () => {
-      return cns.activate(node1.id).then(state => {
-        expect(cns.state[node1.id].activationValue).toBe(100);
-      });
+    it('should cap the activation of an activated node', async () => {
+      await cns.activate(node1.id);
+      expect(cns.state[node1.id].activationValue).toBe(100);
     });
   });
 
   describe('#getters', () => {
     let cn, cns, node1, node2, node3;
     describe('##getActivationValue', () => {
-      beforeAll(() => {
+      beforeAll(async () => {
         cn = ConceptNetwork();
         cns = ConceptNetworkState(cn);
-        return cn
-          .addNode({ label: 'Node 1' })
-          .then(node => {
-            node1 = node;
-            return cn.addNode({ label: 'Node 2' });
-          })
-          .then(node => {
-            node2 = node;
-            return cns.activate(node1.id);
-          });
+        node1 = await cn.addNode({ label: 'Node 1' });
+        node2 = await cn.addNode({ label: 'Node 2' });
+        await cns.activate(node1.id);
       });
 
-      it('should get a zero activation value', () => {
-        return cns.getActivationValue(node2.id).then(activationValue => {
-          expect(activationValue).toBe(0);
-        });
+      it('should get a zero activation value', async () => {
+        const activationValue = await cns.getActivationValue(node2.id);
+        expect(activationValue).toBe(0);
       });
 
-      it('should get a 100 activation value', () => {
-        return cns.getActivationValue(node1.id).then(activationValue => {
-          expect(activationValue).toBe(100);
-        });
+      it('should get a 100 activation value', async () => {
+        const activationValue = await cns.getActivationValue(node1.id);
+        expect(activationValue).toBe(100);
       });
 
-      it('should catch when the node does not have an id', done => {
-        return cns
-          .getActivationValue({ label: 'no id' })
-          .then(state => {
-            done(new Error('This node should not exist'));
-          })
-          .catch(() => {
-            done();
-          });
+      it('should catch when the node does not have an id', async () => {
+        try {
+          const state = await cns.getActivationValue({ label: 'no id' });
+          expect(state).toBeUndefined();
+        } catch (e) {
+          expect(e).not.toBeNull();
+        }
       });
     });
 
     describe('##getOldActivationValue', () => {
-      beforeAll(() => {
+      beforeAll(async () => {
         cn = ConceptNetwork();
         cns = ConceptNetworkState(cn);
-        return cn
-          .addNode({ label: 'Node 1' })
-          .then(node => {
-            node1 = node;
-            return cn.addNode({ label: 'Node 2' });
-          })
-          .then(node => {
-            node2 = node;
-            return cns.activate(node1.id);
-          })
-          .then(state => {
-            return cns.propagate();
-          });
+        node1 = await cn.addNode({ label: 'Node 1' });
+        node2 = await cn.addNode({ label: 'Node 2' });
+        await cns.activate(node1.id);
+        await cns.propagate();
       });
 
-      it('should get a zero activation value', () => {
-        return cns.getOldActivationValue(node2.id).then(oldActivationValue => {
-          expect(oldActivationValue).toBe(0);
-        });
+      it('should get a zero activation value', async () => {
+        const oldActivationValue = await cns.getOldActivationValue(node2.id);
+        expect(oldActivationValue).toBe(0);
       });
 
-      it('should get a 100 activation value', () => {
-        return cns.getOldActivationValue(node1.id).then(oldActivationValue => {
-          expect(oldActivationValue).toBe(100);
-        });
+      it('should get a 100 activation value', async () => {
+        const oldActivationValue = await cns.getOldActivationValue(node1.id);
+        expect(oldActivationValue).toBe(100);
       });
     });
 
     describe('##getMaximumActivationValue', () => {
-      beforeAll(() => {
+      beforeAll(async () => {
         cn = ConceptNetwork();
         cns = ConceptNetworkState(cn);
-        return cn
-          .addNode({ label: 'Node 1' })
-          .then(node => {
-            node1 = node;
-            return cn.addNode({ label: 'Node 2', type: 's' });
-          })
-          .then(node => {
-            node2 = node;
-            return cn.addNode({ label: 'Node 3', type: 't' });
-          })
-          .then(node => {
-            node3 = node;
-          });
+        node1 = await cn.addNode({ label: 'Node 1' });
+        node2 = await cn.addNode({ label: 'Node 2', type: 's' });
+        node3 = await cn.addNode({ label: 'Node 3', type: 't' });
       });
 
-      it('should return 0 when no node is activated', () => {
-        return cns.getMaximumActivationValue().then(maxValue => {
-          expect(maxValue).toBe(0);
-        });
+      it('should return 0 when no node is activated', async () => {
+        const maxValue = await cns.getMaximumActivationValue();
+        expect(maxValue).toBe(0);
       });
 
-      it('should get the maximum activation value for any token', () => {
-        return cns
-          .setActivationValue(node1.id, 75)
-          .then(() => {
-            return cns.setActivationValue(node2.id, 70);
-          })
-          .then(() => {
-            return cns.setActivationValue(node3.id, 50);
-          })
-          .then(() => {
-            return cns.getMaximumActivationValue();
-          })
-          .then(maxValue => {
-            expect(maxValue).toBe(75);
-          });
+      it('should get the maximum activation value for any token', async () => {
+        await cns.setActivationValue(node1.id, 75);
+        await cns.setActivationValue(node2.id, 70);
+        await cns.setActivationValue(node3.id, 50);
+        const maxValue = await cns.getMaximumActivationValue();
+        expect(maxValue).toBe(75);
       });
 
-      it('should get the maximum activation value for s tokens', () => {
-        return cns
-          .setActivationValue(node1.id, 75)
-          .then(() => {
-            return cns.setActivationValue(node2.id, 70);
-          })
-          .then(() => {
-            return cns.setActivationValue(node3.id, 50);
-          })
-          .then(() => {
-            return cns.getMaximumActivationValue('s');
-          })
-          .then(maxValue => {
-            expect(maxValue).toBe(70);
-          });
+      it('should get the maximum activation value for s tokens', async () => {
+        await cns.setActivationValue(node1.id, 75);
+        await cns.setActivationValue(node2.id, 70);
+        await cns.setActivationValue(node3.id, 50);
+        const maxValue = await cns.getMaximumActivationValue('s');
+        expect(maxValue).toBe(70);
       });
     });
 
     describe('##getActivatedTypedNodes', () => {
-      beforeAll(() => {
+      beforeAll(async () => {
         cn = ConceptNetwork();
         cns = ConceptNetworkState(cn);
-        return cn
-          .addNode({ label: 'Node 1' })
-          .then(node => {
-            node1 = node;
-            return cn.addNode({ label: 'Node 2', type: 's' });
-          })
-          .then(node => {
-            node2 = node;
-            return cn.addNode({ label: 'Node 3', type: 't' });
-          })
-          .then(node => {
-            node3 = node;
-          });
+        node1 = await cn.addNode({ label: 'Node 1' });
+        node2 = await cn.addNode({ label: 'Node 2', type: 's' });
+        node3 = await cn.addNode({ label: 'Node 3', type: 't' });
       });
 
-      it('should return an empty array', () => {
-        return cns.getActivatedTypedNodes().then(activatedNodes => {
-          expect(activatedNodes).toBeInstanceOf(Array);
-          expect(activatedNodes).toHaveLength(0);
-        });
+      it('should return an empty array', async () => {
+        const activatedNodes = await cns.getActivatedTypedNodes();
+        expect(activatedNodes).toBeInstanceOf(Array);
+        expect(activatedNodes).toHaveLength(0);
       });
 
-      it('should return one-node-array', () => {
-        return cns
-          .setActivationValue(node1.id, 100)
-          .then(() => {
-            return cns.getActivatedTypedNodes();
-          })
-          .then(result => {
-            expect(result).toEqual([
-              {
-                node: { id: 0, label: 'Node 1', occ: 1 },
-                activationValue: 100
-              }
-            ]);
-          });
+      it('should return one-node-array', async () => {
+        await cns.setActivationValue(node1.id, 100);
+        const result = await cns.getActivatedTypedNodes();
+        expect(result).toEqual([
+          {
+            node: { id: 0, label: 'Node 1', occ: 1 },
+            activationValue: 100
+          }
+        ]);
       });
 
-      it('should return two-nodes-array', () => {
-        return cns
-          .setActivationValue(node2.id, 95)
-          .then(() => {
-            return cns.getActivatedTypedNodes();
-          })
-          .then(result => {
-            expect(result).toEqual([
-              {
-                node: { id: 0, label: 'Node 1', occ: 1 },
-                activationValue: 100
-              },
-              {
-                node: { id: 1, label: 'Node 2', occ: 1, type: 's' },
-                activationValue: 95
-              }
-            ]);
-          });
+      it('should return two-nodes-array', async () => {
+        await cns.setActivationValue(node2.id, 95);
+        const result = await cns.getActivatedTypedNodes();
+        expect(result).toEqual([
+          {
+            node: { id: 0, label: 'Node 1', occ: 1 },
+            activationValue: 100
+          },
+          {
+            node: { id: 1, label: 'Node 2', occ: 1, type: 's' },
+            activationValue: 95
+          }
+        ]);
       });
 
-      it('should return one-node-array of type s', () => {
-        return cns
-          .setActivationValue(node2.id, 95)
-          .then(() => {
-            return cns.getActivatedTypedNodes('s');
-          })
-          .then(result => {
-            expect(result).toEqual([
-              {
-                node: { id: 1, label: 'Node 2', occ: 1, type: 's' },
-                activationValue: 95
-              }
-            ]);
-          });
+      it('should return one-node-array of type s', async () => {
+        await cns.setActivationValue(node2.id, 95);
+        const result = await cns.getActivatedTypedNodes('s');
+        expect(result).toEqual([
+          {
+            node: { id: 1, label: 'Node 2', occ: 1, type: 's' },
+            activationValue: 95
+          }
+        ]);
       });
 
-      it('should return one-node-array where threshold = 96', () => {
-        return cns
-          .setActivationValue(node1.id, 100)
-          .then(() => {
-            return cns.getActivatedTypedNodes('', 96);
-          })
-          .then(result => {
-            expect(result).toEqual([
-              {
-                node: { id: 0, label: 'Node 1', occ: 1 },
-                activationValue: 100
-              }
-            ]);
-          });
+      it('should return one-node-array where threshold = 96', async () => {
+        await cns.setActivationValue(node1.id, 100);
+        const result = await cns.getActivatedTypedNodes('', 96);
+        expect(result).toEqual([
+          {
+            node: { id: 0, label: 'Node 1', occ: 1 },
+            activationValue: 100
+          }
+        ]);
       });
     });
 
@@ -297,141 +210,85 @@ describe('ConceptNetworkState', () => {
   describe('#setters', () => {
     let cn, cns, node1, node2;
     describe('##setActivationValue', () => {
-      beforeAll(() => {
+      beforeAll(async () => {
         cn = ConceptNetwork();
         cns = ConceptNetworkState(cn);
-        return cn
-          .addNode({ label: 'Node 1' })
-          .then(node => {
-            node1 = node;
-            return cn.addNode({ label: 'Node 2' });
-          })
-          .then(node => {
-            node2 = node;
-          });
+        node1 = await cn.addNode({ label: 'Node 1' });
+        node2 = await cn.addNode({ label: 'Node 2' });
       });
 
-      it('should set a zero activation value', () => {
-        return cns
-          .setActivationValue(node2.id, 0)
-          .then(() => {
-            return cns.getActivationValue(node2.id);
-          })
-          .then(activationValue => {
-            expect(activationValue).toBe(0);
-          });
+      it('should set a zero activation value', async () => {
+        await cns.setActivationValue(node2.id, 0);
+        const activationValue = await cns.getActivationValue(node2.id);
+        expect(activationValue).toBe(0);
       });
 
-      it('should set a 75 activation value', () => {
-        return cns
-          .setActivationValue(node1.id, 75)
-          .then(() => {
-            return cns.getActivationValue(node1.id);
-          })
-          .then(activationValue => {
-            expect(activationValue).toBe(75);
-          });
+      it('should set a 75 activation value', async () => {
+        await cns.setActivationValue(node1.id, 75);
+        const activationValue = await cns.getActivationValue(node1.id);
+        expect(activationValue).toBe(75);
       });
     });
   });
 
   describe('#propagate', () => {
     var cn, cns, node1, node2;
-    beforeAll(() => {
+    beforeAll(async () => {
       cn = ConceptNetwork();
       cns = ConceptNetworkState(cn);
-      cn
-        .addNode({ label: 'Node 1' })
-        .then(node => {
-          node1 = node;
-          return cn.addNode({ label: 'Node 2' });
-        })
-        .then(node => {
-          node2 = node;
-          return cn.addLink(node1.id, node2.id);
-        });
+      node1 = await cn.addNode({ label: 'Node 1' });
+      node2 = await cn.addNode({ label: 'Node 2' });
+      await cn.addLink(node1.id, node2.id);
     });
 
-    it('should deactivate node without afferent links', () => {
-      return cns
-        .activate(node1.id)
-        .then(node => {
-          return cns.getActivationValue(node1.id);
-        })
-        .then(value => {
-          expect(value).toBe(100);
-          return cns.propagate();
-        })
-        .then(() => {
-          return cns.getActivationValue(node1.id);
-        })
-        .then(value => {
-          expect(value).toBeLessThan(100);
-        });
+    it('should deactivate node without afferent links', async () => {
+      await cns.activate(node1.id);
+      const value = await cns.getActivationValue(node1.id);
+      expect(value).toBe(100);
+      await cns.propagate();
+      const newValue = await cns.getActivationValue(node1.id);
+      expect(newValue).toBeLessThan(100);
     });
 
-    it('should activate node 2', () => {
-      return cns.getActivationValue(node2.id).then(value => {
-        expect(value).toBeGreaterThan(0);
-      });
+    it('should activate node 2', async () => {
+      const value = await cns.getActivationValue(node2.id);
+      expect(value).toBeGreaterThan(0);
     });
 
-    it('should accept options', () => {
-      return cns.propagate({ anything: 1 });
+    it('should accept options', async () => {
+      await cns.propagate({ anything: 1 });
     });
 
-    it('should take decay into account', () => {
-      return cns.propagate({ decay: 200 }).then(() => {
-        const array = [1, 2];
-        delete array[0];
-        delete array[1];
-        expect(cns.state).toBeInstanceOf(Array);
-        expect(cns.state).toEqual(array); // all nodes should be deactivated
-      });
+    it('should take decay into account', async () => {
+      await cns.propagate({ decay: 200 });
+      const array = [1, 2];
+      delete array[0];
+      delete array[1];
+      expect(cns.state).toBeInstanceOf(Array);
+      expect(cns.state).toEqual(array); // all nodes should be deactivated
     });
 
-    it('should take memoryPerf into account', () => {
-      return cns
-        .activate(node1.id)
-        .then(state => {
-          return cns.propagate({ memoryPerf: Infinity });
-        })
-        .then(() => {
-          return cns.getActivationValue(node1.id);
-        })
-        .then(value => {
-          expect(value).toEqual(
-            60,
-            'with an infinite memory perf, ' +
-              'activation should not decay too much'
-          );
-        });
+    it('should take memoryPerf into account', async () => {
+      await cns.activate(node1.id);
+      await cns.propagate({ memoryPerf: Infinity });
+      const value = await cns.getActivationValue(node1.id);
+      expect(value).toEqual(60); // with an infinite memory perf, activation should not decay too much
     });
 
-    it('should return an error when first parameter is not an object', done => {
-      cns
-        .propagate(1)
-        .then(() => done(new Error('Should return an error')))
-        .catch(err => {
-          expect(err).toBeInstanceOf(Error);
-          done();
-        });
+    it('should return an error when first parameter is not an object', async () => {
+      try {
+        await cns.propagate(1);
+        throw new Error('Should throw an error');
+      } catch (err) {
+        expect(err).toBeInstanceOf(Error);
+      }
     });
 
-    it('should use already existing influenceValue', () => {
-      var node3;
-      cn
-        .addNode({ label: 'Node 3' })
-        .then(node => {
-          node3 = node;
-          return cn.addLink(node3.id, node2.id);
-        })
-        .then(link => {
-          return cns.activate(node1.id);
-        })
-        .then(state => {
-          return cns.propagate();
-        });
+    it('should use already existing influenceValue', async () => {
+      const node3 = await cn.addNode({ label: 'Node 3' });
+      const link = await cn.addLink(node3.id, node2.id);
+      await cns.activate(node1.id);
+      await cns.propagate();
     });
   });
 });
