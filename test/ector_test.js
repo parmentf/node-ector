@@ -229,17 +229,17 @@ describe('Bot', function() {
           expect(cn.link['2_3']).to.be.deep.equal({
             fromId: 2,
             toId: 3,
-            coOcc: 1,
+            coOcc: 1
           });
           expect(cn.link['3_4']).to.be.deep.equal({
             fromId: 3,
             toId: 4,
-            coOcc: 1,
+            coOcc: 1
           });
           expect(cn.link['4_5']).to.be.deep.equal({
             fromId: 4,
             toId: 5,
-            coOcc: 1,
+            coOcc: 1
           });
         });
       });

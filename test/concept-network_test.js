@@ -231,7 +231,7 @@ describe('ConceptNetwork', function() {
       return cn.addLink(1, 3).then(link => {
         expect(Array.from(cn.fromIndex[1].values())).to.be.deep.equal([
           '1_2',
-          '1_3',
+          '1_3'
         ]);
       });
     });

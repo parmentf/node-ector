@@ -237,8 +237,8 @@ describe('ConceptNetworkState', function() {
             expect(result).to.be.deep.equal([
               {
                 node: { id: 0, label: 'Node 1', occ: 1 },
-                activationValue: 100,
-              },
+                activationValue: 100
+              }
             ]);
           });
       });
@@ -253,12 +253,12 @@ describe('ConceptNetworkState', function() {
             expect(result).to.be.deep.equal([
               {
                 node: { id: 0, label: 'Node 1', occ: 1 },
-                activationValue: 100,
+                activationValue: 100
               },
               {
                 node: { id: 1, label: 'Node 2', occ: 1, type: 's' },
-                activationValue: 95,
-              },
+                activationValue: 95
+              }
             ]);
           });
       });
@@ -273,8 +273,8 @@ describe('ConceptNetworkState', function() {
             expect(result).to.be.deep.equal([
               {
                 node: { id: 1, label: 'Node 2', occ: 1, type: 's' },
-                activationValue: 95,
-              },
+                activationValue: 95
+              }
             ]);
           });
       });
@@ -289,8 +289,8 @@ describe('ConceptNetworkState', function() {
             expect(result).to.be.deep.equal([
               {
                 node: { id: 0, label: 'Node 1', occ: 1 },
-                activationValue: 100,
-              },
+                activationValue: 100
+              }
             ]);
           });
       });
