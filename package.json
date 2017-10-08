@@ -22,7 +22,7 @@
   "scripts": {
     "build": "babel src -d lib",
     "lint": "eslint 'src/*.js' 'test/*.js'",
-    "prettier": "prettier --single-quote es5 --write \"{app,test,__{tests,mocks}__}/**/*.js\"",
+    "prettier": "prettier --single-quote es5 --write \"{app,__{tests,mocks}__}/**/*.js\"",
     "test": "jest",
     "test-w": "jest --watch"
   },
