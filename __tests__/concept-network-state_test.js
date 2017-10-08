@@ -1,5 +1,3 @@
-'use strict';
-
 import { ConceptNetwork } from '../lib/concept-network';
 import { ConceptNetworkState } from '../lib/concept-network-state';
 
@@ -8,14 +6,14 @@ describe('ConceptNetworkState', () => {
     it('should throw an exception if no ConceptNetwork is given', () => {
       expect(() => {
         ConceptNetworkState();
-      }).toThrow(Error);
+      }).toThrow();
     });
 
     it('should not throw an exception', () => {
       expect(() => {
         const cn = ConceptNetwork();
         ConceptNetworkState(cn);
-      }).not.toThrow(Error);
+      }).not.toThrow();
     });
 
     it('should be called from a derived constructor', () => {
