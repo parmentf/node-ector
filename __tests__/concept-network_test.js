@@ -3,14 +3,14 @@ const debug = Debug('ector:concept-network:test'); // eslint-disable-line no-unu
 
 import { ConceptNetwork } from '../lib/concept-network';
 
-describe('ConceptNetwork', function() {
-  describe('Creator', function() {
-    it('should not throw an exception', function() {
+describe('ConceptNetwork', () => {
+  describe('Creator', () => {
+    it('should not throw an exception', () => {
       expect(ConceptNetwork).not.toThrow();
     });
 
-    it('should be called from a derived constructor', function() {
-      var DerivedConceptNetwork = function() {
+    it('should be called from a derived constructor', () => {
+      var DerivedConceptNetwork = () => {
         // Inherit ConceptNetwork
         return ConceptNetwork();
       };
@@ -32,12 +32,12 @@ describe('ConceptNetwork', function() {
 
   let cn;
 
-  describe('addNode', function() {
-    beforeAll(function() {
+  describe('addNode', () => {
+    beforeAll(() => {
       cn = ConceptNetwork();
     });
 
-    it('should return an object', function() {
+    it('should return an object', () => {
       return cn.addNode({ label: 'Chuck Norris' }).then(node => {
         expect(node.id).toBe(0);
         expect(node.label).toBe('Chuck Norris');
@@ -45,35 +45,35 @@ describe('ConceptNetwork', function() {
       });
     });
 
-    it('should increment occ', function() {
+    it('should increment occ', () => {
       return cn.addNode({ label: 'Chuck Norris' }).then(node => {
         expect(node.id).toBe(0);
         expect(node.occ).toBe(2);
       });
     });
 
-    it('should increment nodeLastId', function() {
+    it('should increment nodeLastId', () => {
       return cn.addNode({ label: 'World' }).then(node => {
         expect(node.id).toBe(1);
         expect(cn.node).toHaveLength(2);
       });
     });
 
-    it('should increment a previous node too', function() {
+    it('should increment a previous node too', () => {
       return cn.addNode({ label: 'Chuck Norris' }).then(node => {
         expect(node.id).toBe(0);
         expect(node.occ).toBe(3);
       });
     });
 
-    it('should increment more than one', function() {
+    it('should increment more than one', () => {
       return cn.addNode({ label: 'Steven Seagal' }, 3).then(node => {
         expect(node.id).toBe(2);
         expect(node.occ).toBe(3);
       });
     });
 
-    it('should accept a second argument with a undefined value', function() {
+    it('should accept a second argument with a undefined value', () => {
       return cn
         .addNode({ label: 'Jean-Claude Van Damme' }, undefined)
         .then(node => {
@@ -83,21 +83,21 @@ describe('ConceptNetwork', function() {
     });
   });
 
-  describe('decrementNode', function() {
-    it('should decrement a node with occ of 3', function() {
+  describe('decrementNode', () => {
+    it('should decrement a node with occ of 3', () => {
       return cn.decrementNode({ label: 'Chuck Norris' }).then(node => {
         expect(node.id).toBe(0);
         expect(node.occ).toBe(2);
       });
     });
 
-    it('should remove a node with an occ of 1', function() {
+    it('should remove a node with an occ of 1', () => {
       return cn.decrementNode({ label: 'World' }).then(node => {
         expect(node).toBeNull();
       });
     });
 
-    it('should return null when node does not exist', function() {
+    it('should return null when node does not exist', () => {
       return cn.decrementNode({ label: 'unexisting' }).then(node => {
         expect(node).toBeNull();
       });
@@ -139,8 +139,8 @@ describe('ConceptNetwork', function() {
     });
   });
 
-  describe('removeNode', function() {
-    beforeEach(function() {
+  describe('removeNode', () => {
+    beforeEach(() => {
       cn = ConceptNetwork();
       return cn
         .addNode({ label: 'Node 1' })
@@ -162,28 +162,28 @@ describe('ConceptNetwork', function() {
         });
     });
 
-    it('should remove even a node with occ value of 2', function() {
+    it('should remove even a node with occ value of 2', () => {
       expect(cn.node[0].occ).toBe(2);
       return cn.removeNode(cn.node[0].id).then(() => {
         expect(cn.node[0]).toBeUndefined();
       });
     });
 
-    it('should remove the links from the removed node', function() {
+    it('should remove the links from the removed node', () => {
       return cn.removeNode(2).then(() => {
         expect(cn.link['2_3']).toBeUndefined();
       });
     });
 
-    it('should remove the links to the removed node', function() {
+    it('should remove the links to the removed node', () => {
       return cn.removeNode(4).then(() => {
         expect(cn.link['3_4']).toBeUndefined();
       });
     });
   });
 
-  describe('addLink', function() {
-    beforeAll(function() {
+  describe('addLink', () => {
+    beforeAll(() => {
       cn = new ConceptNetwork();
       return cn
         .addNode({ label: 'Node 1' })
@@ -195,32 +195,32 @@ describe('ConceptNetwork', function() {
         });
     });
 
-    it('should return an object', function() {
+    it('should return an object', () => {
       return cn.addLink(1, 2).then(link => {
         expect(link).toBeInstanceOf(Object);
         expect(link.coOcc).toBe(1);
       });
     });
 
-    it('should increment coOcc', function() {
+    it('should increment coOcc', () => {
       return cn.addLink(1, 2).then(link => {
         expect(link.coOcc).toBe(2);
       });
     });
 
-    it('should increment with more than 1', function() {
+    it('should increment with more than 1', () => {
       return cn.addLink(1, 2, 4).then(link => {
         expect(link.coOcc).toBe(6);
       });
     });
 
-    it('should create a good fromIndex', function() {
+    it('should create a good fromIndex', () => {
       return cn.addLink(1, 3).then(link => {
         expect(Array.from(cn.fromIndex[1].values())).toEqual(['1_2', '1_3']);
       });
     });
 
-    it('should not accept non number ids', function(done) {
+    it('should not accept non number ids', done => {
       cn
         .addLink(1, 'berf')
         .then(link => {})
@@ -236,15 +236,15 @@ describe('ConceptNetwork', function() {
         });
     });
 
-    it('should increment by 1, without an inc', function() {
+    it('should increment by 1, without an inc', () => {
       return cn.addLink(1, 2, undefined).then(link => {
         expect(link.coOcc).toBe(7);
       });
     });
   });
 
-  describe('decrementLink', function() {
-    beforeAll(function() {
+  describe('decrementLink', () => {
+    beforeAll(() => {
       cn = ConceptNetwork();
       return cn
         .addNode({ label: 'Node 1' })
@@ -259,14 +259,14 @@ describe('ConceptNetwork', function() {
         });
     });
 
-    it('should decrement a coOcc value of 2', function() {
+    it('should decrement a coOcc value of 2', () => {
       expect(cn.link['1_2'].coOcc).toBe(2);
       return cn.decrementLink('1_2').then(link => {
         expect(cn.link['1_2'].coOcc).toBe(1);
       });
     });
 
-    it('should remove a link with a coOcc value of 0', function() {
+    it('should remove a link with a coOcc value of 0', () => {
       expect(cn.link['1_2'].coOcc).toBe(1);
       return cn.decrementLink('1_2').then(() => {
         expect(cn.link['1_2']).toBeUndefined();
@@ -274,8 +274,8 @@ describe('ConceptNetwork', function() {
     });
   });
 
-  describe('removeLink', function() {
-    beforeEach(function() {
+  describe('removeLink', () => {
+    beforeEach(() => {
       cn = ConceptNetwork();
       return cn
         .addNode({ label: 'Node 1' })
@@ -287,14 +287,14 @@ describe('ConceptNetwork', function() {
         });
     });
 
-    it('should remove the link', function() {
+    it('should remove the link', () => {
       expect(cn.link['1_2']).toEqual({ fromId: 1, toId: 2, coOcc: 1 });
       return cn.removeLink('1_2').then(() => {
         expect(cn.link['1_2']).toBeUndefined();
       });
     });
 
-    it('should remove the link, even with a toId', function() {
+    it('should remove the link, even with a toId', () => {
       expect(cn.link['1_2']).toEqual({ fromId: 1, toId: 2, coOcc: 1 });
       return cn.removeLink(1, 2).then(() => {
         expect(cn.link['1_2']).toBeUndefined();
@@ -302,8 +302,8 @@ describe('ConceptNetwork', function() {
     });
   });
 
-  describe('getters', function() {
-    beforeAll(function() {
+  describe('getters', () => {
+    beforeAll(() => {
       cn = ConceptNetwork();
       return cn
         .addNode({ label: 'Node 1' })
@@ -324,22 +324,22 @@ describe('ConceptNetwork', function() {
         });
     });
 
-    describe('getNode', function() {
-      it('should get the second node', function() {
+    describe('getNode', () => {
+      it('should get the second node', () => {
         return cn.getNode({ label: 'Node 2' }).then(node => {
           expect(node.id).toBe(1);
         });
       });
 
-      it('should return undefined when the node does not exist', function() {
+      it('should return undefined when the node does not exist', () => {
         return cn.getNode({ label: 'Nonexistent' }).then(node => {
           expect(node).toBeUndefined();
         });
       });
     });
 
-    describe('getLink', function() {
-      it('should get the link', function() {
+    describe('getLink', () => {
+      it('should get the link', () => {
         return cn.getLink('1_2').then(link => {
           expect(link.fromId).toBe(1);
           expect(link.toId).toBe(2);
@@ -347,7 +347,7 @@ describe('ConceptNetwork', function() {
         });
       });
 
-      it('should get the link with two parameters', function() {
+      it('should get the link with two parameters', () => {
         return cn.getLink(1, 2).then(link => {
           expect(link.fromId).toBe(1);
           expect(link.toId).toBe(2);
@@ -355,47 +355,47 @@ describe('ConceptNetwork', function() {
         });
       });
 
-      it('should return undefined when the node does not exist', function() {
+      it('should return undefined when the node does not exist', () => {
         return cn.getLink(1, 100).then(link => {
           expect(link).toBeUndefined();
         });
       });
     });
 
-    describe('getNodeFromLinks', function() {
-      it('should get all links from node 2', function() {
+    describe('getNodeFromLinks', () => {
+      it('should get all links from node 2', () => {
         return cn.getNodeFromLinks(1).then(fromLinks => {
           expect(fromLinks).toEqual(['1_2']);
         });
       });
 
-      it('should get all links from node 1', function() {
+      it('should get all links from node 1', () => {
         return cn.getNodeFromLinks(0).then(fromLinks => {
           expect(fromLinks).toEqual(['0_1', '0_2']);
         });
       });
 
-      it('should get no links from node 3', function() {
+      it('should get no links from node 3', () => {
         return cn.getNodeFromLinks(2).then(fromLinks => {
           expect(fromLinks).toEqual([]);
         });
       });
     });
 
-    describe('getNodeToLinks', function() {
-      it('should get all links to node 2', function() {
+    describe('getNodeToLinks', () => {
+      it('should get all links to node 2', () => {
         return cn.getNodeToLinks(1).then(toLinks => {
           expect(toLinks).toEqual(['0_1']);
         });
       });
 
-      it('should get all links to node 3', function() {
+      it('should get all links to node 3', () => {
         return cn.getNodeToLinks(2).then(toLinks => {
           expect(toLinks).toEqual(['0_2', '1_2']);
         });
       });
 
-      it('should get no links to node 1', function() {
+      it('should get no links to node 1', () => {
         return cn.getNodeToLinks(0).then(toLinks => {
           expect(toLinks).toEqual([]);
         });
