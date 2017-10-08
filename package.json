@@ -23,7 +23,8 @@
     "build": "babel src -d lib",
     "lint": "eslint 'src/*.js' 'test/*.js'",
     "prettier": "prettier --single-quote es5 --write \"{app,test,__{tests,mocks}__}/**/*.js\"",
-    "test": "mocha"
+    "test": "jest",
+    "test-w": "jest --watch"
   },
   "dependencies": {
     "debug": "^3.1.0",
