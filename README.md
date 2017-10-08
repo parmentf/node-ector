@@ -88,7 +88,11 @@ Or you add the [hubot-ector script](https://github.com/parmentf/hubot-ector)
 to a [Hubot](https://github.com/github/hubot).
 
 ## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [mocha](http://visionmedia.github.com/mocha/).
+In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint (using `npm run prettier`) and test your code using [jest](https://facebook.github.io/jest/).
+
+### Testing
+
+You can open two shells, and run `npm run test-w` in one, and `npm run build-w`, that way each time you modify any tests or any source code, the tests are up to date.
 
 ## Release History
 
