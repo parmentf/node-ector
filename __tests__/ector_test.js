@@ -1,119 +1,108 @@
-/* eslint-env mocha*/
-'use strict';
+import Debug from 'debug';
+const debug = Debug('ector:test');
+import { ConceptNetworkState } from '../lib/concept-network-state';
+import { ConceptNetwork } from '../lib/concept-network';
+import { Ector } from '../lib/ector';
 
-// ## Required libraries
-var debug = require('debug')('ector:test'); // eslint-disable-line no-unused-vars
-var assert = require('assert'); // Maybe one day "should"?
-const expect = require('chai').expect;
-var ConceptNetworkState = require('../lib/concept-network-state')
-  .ConceptNetworkState;
-var ConceptNetwork = require('../lib/concept-network').ConceptNetwork;
-
-var Ector = require('../lib/ector.js').Ector;
-
-describe('Constructor', function() {
-  describe('No botname', function() {
-    it('should not throw an exception', function() {
-      assert.doesNotThrow(
-        function() {
-          Ector();
-        },
-        null,
-        'unexpected error'
-      );
+describe('Constructor', () => {
+  describe('No botname', () => {
+    it('should not throw an exception', () => {
+      expect(() => {
+        Ector();
+      }).not.toThrow();
     });
 
-    it('should be ECTOR', function() {
+    it('should be ECTOR', () => {
       var ector = Ector();
-      assert.equal(ector.name, 'ECTOR', "ECTOR's name is not ECTOR!");
+      expect(ector.name).toBe('ECTOR');
     });
   });
 
-  describe('A new botname', function() {
-    it('should get the given name', function() {
+  describe('A new botname', () => {
+    it('should get the given name', () => {
       var ector = Ector('Nestor');
-      assert.equal(ector.name, 'Nestor', "ECTOR's name should be Nestor");
+      expect(ector.name).toBe('Nestor');
     });
   });
 
-  describe('Bad botname', function() {
-    it('should not be a number', function() {
+  describe('Bad botname', () => {
+    it('should not be a number', () => {
       var ector = Ector(1);
-      assert.equal(ector.name, 'ECTOR');
+      expect(ector.name).toBe('ECTOR');
     });
   });
 
-  describe('Usernames', function() {
-    describe('No username', function() {
-      it('should be "Guy"', function() {
+  describe('Usernames', () => {
+    describe('No username', () => {
+      it('should be "Guy"', () => {
         var ector = Ector();
-        assert.equal(ector.user, 'Guy', "ECTOR's username should be Guy");
+        expect(ector.user).toBe('Guy');
       });
     });
 
-    describe('Bad username', function() {
-      it('should not be a number', function() {
+    describe('Bad username', () => {
+      it('should not be a number', () => {
         var ector = Ector(null, 1);
-        assert.equal(ector.name, 'ECTOR');
-        assert.equal(ector.user, 'Guy');
+        expect(ector.name).toBe('ECTOR');
+        expect(ector.user).toBe('Guy');
       });
 
-      it('should not be a too short', function() {
+      it('should not be a too short', () => {
         var ector = Ector(null, 'Al');
-        assert.equal(ector.user, 'Guy');
+        expect(ector.user).toBe('Guy');
       });
     });
 
-    describe('ConceptNetworkState', function() {
-      it('should add one, for the default username', function() {
+    describe('ConceptNetworkState', () => {
+      it('should add one, for the default username', () => {
         var ector = Ector(null, 'Guy');
-        assert.equal(typeof ector.cns['Guy'], 'object');
+        expect(ector.cns['Guy']).toBeInstanceOf(Object);
       });
 
-      it('should add one, for an unknown username', function() {
+      it('should add one, for an unknown username', () => {
         var ector = Ector(null, 'Guy');
         ector.user = 'Chuck';
-        assert.equal(typeof ector.cns['Chuck'], 'object');
+        expect(ector.cns['Chuck']).toBeInstanceOf(Object);
       });
     });
   });
 });
 
-describe('Users', function() {
-  describe('Change username', function() {
-    it('should change for another string', function() {
+describe('Users', () => {
+  describe('Change username', () => {
+    it('should change for another string', () => {
       var ector = Ector();
-      assert.equal(ector.user, 'Guy');
+      expect(ector.user).toBe('Guy');
       ector.user = 'Chuck';
-      assert.equal(ector.user, 'Chuck');
+      expect(ector.user).toBe('Chuck');
     });
 
-    it('should not work with a number', function() {
+    it('should not work with a number', () => {
       var ector = Ector();
-      assert.equal(ector.user, 'Guy');
+      expect(ector.user).toBe('Guy');
       ector.user = 1;
-      assert.equal(ector.user, 'Guy');
+      expect(ector.user).toBe('Guy');
     });
 
-    it('should not be an empty name', function() {
+    it('should not be an empty name', () => {
       var ector = Ector();
-      assert.equal(ector.user, 'Guy');
+      expect(ector.user).toBe('Guy');
       ector.user = '';
-      assert.equal(ector.user, 'Guy');
+      expect(ector.user).toBe('Guy');
     });
 
-    it('should not be too short (< 3)', function() {
+    it('should not be too short (< 3)', () => {
       var ector = Ector();
-      assert.equal(ector.user, 'Guy');
+      expect(ector.user).toBe('Guy');
       ector.user = 'Al';
-      assert.equal(ector.user, 'Guy');
+      expect(ector.user).toBe('Guy');
     });
 
-    it('should reset the lastSentenceNodeId', function() {
+    it('should reset the lastSentenceNodeId', () => {
       var ector = Ector();
       ector.lastSentenceNodeId = 1;
       ector.user = 'Ali';
-      assert.equal(ector.lastSentenceNodeId, null);
+      expect(ector.lastSentenceNodeId).toBeNull();
     });
 
     //    it('should not be changed using property _username', function () {
@@ -125,89 +114,88 @@ describe('Users', function() {
   });
 });
 
-// ### Bot
-describe('Bot', function() {
-  describe('Change botname', function() {
-    it('should change for another string', function() {
+describe('Bot', () => {
+  describe('Change botname', () => {
+    it('should change for another string', () => {
       var ector = Ector();
-      assert.equal(ector.name, 'ECTOR');
+      expect(ector.name).toBe('ECTOR');
       ector.name = 'Norris';
-      assert.equal(ector.name, 'Norris');
+      expect(ector.name).toBe('Norris');
     });
 
-    it('should not work with a number', function() {
+    it('should not work with a number', () => {
       var ector = Ector();
-      assert.equal(ector.name, 'ECTOR');
+      expect(ector.name).toBe('ECTOR');
       ector.name = 1;
-      assert.equal(ector.name, 'ECTOR');
+      expect(ector.name).toBe('ECTOR');
     });
   });
 
-  describe('Add an entry', function() {
-    describe('in the Concept Network', function(done) {
-      it('should return an error when entry is empty', function() {
+  describe('Add an entry', () => {
+    describe('in the Concept Network', () => {
+      it('should return an error when entry is empty', done => {
         const ector = Ector();
         ector.addEntry('').catch(() => {
           done();
         });
       });
 
-      it('should return an error when entry is not a string', function(done) {
+      it('should return an error when entry is not a string', done => {
         var ector = Ector();
         ector.addEntry().catch(() => {
           done();
         });
       });
 
-      it('should create a sentence node', function() {
+      it('should create a sentence node', () => {
         var ector = Ector();
         return ector.addEntry('Hello.').then(nodes => {
-          expect(ector.cn.node[1].label).to.be.equal('Hello.');
-          expect(ector.cn.node[1].type).to.be.equal('s');
+          expect(ector.cn.node[1].label).toBe('Hello.');
+          expect(ector.cn.node[1].type).toBe('s');
         });
       });
 
-      it('should return an array of one word node', function() {
+      it('should return an array of one word node', () => {
         var ector = Ector();
         return ector.addEntry('Hello.').then(nodes => {
-          expect(nodes).to.not.be.an('error');
-          expect(nodes).to.be.lengthOf(1);
-          expect(nodes[0].label).to.be.equal('Hello.');
-          expect(nodes[0].type).to.be.equal('w');
+          expect(nodes).not.toBeInstanceOf(Error);
+          expect(nodes).toHaveLength(1);
+          expect(nodes[0].label).toBe('Hello.');
+          expect(nodes[0].type).toBe('w');
         });
       });
 
-      it('should return an array of two word nodes', function() {
+      it('should return an array of two word nodes', () => {
         var ector = Ector();
         return ector.addEntry('Hello world.').then(nodes => {
-          expect(nodes).to.not.be.an('error');
-          expect(nodes).to.be.lengthOf(2);
-          expect(nodes[0].label).to.be.equal('Hello');
-          expect(nodes[0].type).to.be.equal('w');
-          expect(nodes[1].label).to.be.equal('world.');
-          expect(nodes[1].type).to.be.equal('w');
+          expect(nodes).not.toBeInstanceOf(Error);
+          expect(nodes).toHaveLength(2);
+          expect(nodes[0].label).toBe('Hello');
+          expect(nodes[0].type).toBe('w');
+          expect(nodes[1].label).toBe('world.');
+          expect(nodes[1].type).toBe('w');
         });
       });
 
-      it('should add the nodes in the concept network', function() {
+      it('should add the nodes in the concept network', () => {
         var ector = Ector();
         var cn = ector.cn;
-        expect(cn).to.be.not.null;
+        expect(cn).not.toBeNull();
         return ector.addEntry('Hello world.').then(nodes => {
-          expect(cn.node).to.be.lengthOf(4);
+          expect(cn.node).toHaveLength(4);
         });
       });
 
-      it('should add positions in the sentence', function() {
+      it('should add positions in the sentence', () => {
         var ector = Ector();
         return ector.addEntry('Salut tout le monde.').then(nodes => {
-          expect(nodes[0].beg).to.be.equal(1);
-          expect(nodes[2].mid).to.be.equal(1);
-          expect(nodes[3].end).to.be.equal(1);
+          expect(nodes[0].beg).toBe(1);
+          expect(nodes[2].mid).toBe(1);
+          expect(nodes[3].end).toBe(1);
         });
       });
 
-      it('should increment positions in the sentence', function() {
+      it('should increment positions in the sentence', () => {
         var ector = Ector();
         return ector
           .addEntry('Salut tout le monde.')
@@ -215,28 +203,28 @@ describe('Bot', function() {
             return ector.addEntry('Salut le peuple du monde.');
           })
           .then(nodes2 => {
-            expect(nodes2[0].beg).to.be.equal(2);
-            expect(nodes2[1].mid).to.be.equal(2);
-            expect(nodes2[2].mid).to.be.equal(1);
-            expect(nodes2[4].end).to.be.equal(2);
+            expect(nodes2[0].beg).toBe(2);
+            expect(nodes2[1].mid).toBe(2);
+            expect(nodes2[2].mid).toBe(1);
+            expect(nodes2[4].end).toBe(2);
           });
       });
 
-      it('should add links between following tokens', function() {
+      it('should add links between following tokens', () => {
         var ector = Ector();
         var cn = ector.cn;
         return ector.addEntry('Salut tout le monde.').then(nodes => {
-          expect(cn.link['2_3']).to.be.deep.equal({
+          expect(cn.link['2_3']).toEqual({
             fromId: 2,
             toId: 3,
             coOcc: 1
           });
-          expect(cn.link['3_4']).to.be.deep.equal({
+          expect(cn.link['3_4']).toEqual({
             fromId: 3,
             toId: 4,
             coOcc: 1
           });
-          expect(cn.link['4_5']).to.be.deep.equal({
+          expect(cn.link['4_5']).toEqual({
             fromId: 4,
             toId: 5,
             coOcc: 1
@@ -244,229 +232,228 @@ describe('Bot', function() {
         });
       });
 
-      it('should add links between sentence and its tokens', function() {
+      it('should add links between sentence and its tokens', () => {
         var ector = Ector();
         var cn = ector.cn;
         return ector.addEntry('Salut tout le monde.').then(nodes => {
-          expect(cn.link['1_2']).to.eql({ fromId: 1, toId: 2, coOcc: 1 });
-          expect(cn.link['1_3']).to.eql({ fromId: 1, toId: 3, coOcc: 1 });
-          expect(cn.link['1_4']).to.eql({ fromId: 1, toId: 4, coOcc: 1 });
-          expect(cn.link['1_5']).to.eql({ fromId: 1, toId: 5, coOcc: 1 });
+          expect(cn.link['1_2']).toEqual({ fromId: 1, toId: 2, coOcc: 1 });
+          expect(cn.link['1_3']).toEqual({ fromId: 1, toId: 3, coOcc: 1 });
+          expect(cn.link['1_4']).toEqual({ fromId: 1, toId: 4, coOcc: 1 });
+          expect(cn.link['1_5']).toEqual({ fromId: 1, toId: 5, coOcc: 1 });
         });
       });
 
-      it('should add links between following sentences', function() {
+      it('should add links between following sentences', () => {
         var ector = Ector();
         var cn = ector.cn;
         return ector.addEntry('Ah! Oh.').then(nodes => {
-          expect(cn.link['1_3']).to.eql({ fromId: 1, toId: 3, coOcc: 1 });
+          expect(cn.link['1_3']).toEqual({ fromId: 1, toId: 3, coOcc: 1 });
         });
       });
 
-      it('should increment links between following tokens', function() {
+      it('should increment links between following tokens', () => {
         var ector = Ector();
         var cn = ector.cn;
         return ector
           .addEntry('Salut tout le monde.')
           .then(nodes => {
-            expect(cn.link['2_3']).to.eql({ fromId: 2, toId: 3, coOcc: 1 });
+            expect(cn.link['2_3']).toEqual({ fromId: 2, toId: 3, coOcc: 1 });
             return ector.addEntry('Salut tout le peuple.');
           })
           .then(nodes => {
-            expect(cn.link['2_3']).to.eql({ fromId: 2, toId: 3, coOcc: 2 });
+            expect(cn.link['2_3']).toEqual({ fromId: 2, toId: 3, coOcc: 2 });
           });
       });
 
-      it('should create tokens from second sentence', function() {
+      it('should create tokens from second sentence', () => {
         var ector = Ector();
         var cn = ector.cn;
         return ector.addEntry('Salut. Hello.').then(nodes => {
-          expect(cn.node).to.be.lengthOf(5);
+          expect(cn.node).toHaveLength(5);
         });
       });
 
-      it('should create node for second sentence', function() {
+      it('should create node for second sentence', () => {
         var ector = Ector();
         var cn = ector.cn;
         return ector.addEntry('Salut. Hello.').then(nodes => {
-          expect(cn.nodeIndex).to.have.any.keys('sHello.');
+          expect(Object.keys(cn.nodeIndex)).toContain('sHello.');
         });
       });
 
-      it('should count Hello as a beginning node.', function() {
+      it('should count Hello as a beginning node.', () => {
         var ector = Ector();
         var cn = ector.cn;
         return ector.addEntry('Salut. Hello.').then(nodes => {
-          expect(cn.node[4].beg).to.be.a('number');
-          expect(cn.node[4].beg).to.be.equal(1);
-          expect(cn.node[3].beg).to.be.a('number');
-          expect(cn.node[3].beg).to.be.equal(1);
+          expect(cn.node[4].beg).toBeInstanceOf(Number);
+          expect(cn.node[4].beg).toBe(1);
+          expect(cn.node[3].beg).toBeInstanceOf(Number);
+          expect(cn.node[3].beg).toBe(1);
         });
       });
     });
 
-    describe('in the ConceptNetworkState', function() {
+    describe('in the ConceptNetworkState', () => {
       var ector, cn, cns;
 
-      before(function() {
+      beforeAll(() => {
         ector = Ector();
         cn = ector.cn;
         cns = ConceptNetworkState(cn);
         return ector.addEntry('Sentence one.', cns);
       });
 
-      describe('with a two-tokens sentence', function() {
-        before(function() {
+      describe('with a two-tokens sentence', () => {
+        beforeAll(() => {
           return ector.addEntry('Sentence one.', cns);
         });
 
-        it('should activate the sentence node', function() {
+        it('should activate the sentence node', () => {
           return cns.getActivationValue(1).then(value => {
-            expect(value).to.be.equal(100);
+            expect(value).toBe(100);
           });
         });
 
-        it('should activate the token node', function() {
+        it('should activate the token node', () => {
           return cns
             .getActivationValue(2)
             .then(value2 => {
-              expect(value2).to.be.equal(100);
+              expect(value2).toBe(100);
               return cns.getActivationValue(3);
             })
             .then(value3 => {
-              expect(value3).to.be.equal(100);
+              expect(value3).toBe(100);
             });
         });
       });
 
-      describe('with a one-token sentence', function() {
-        before(function() {
+      describe('with a one-token sentence', () => {
+        beforeAll(() => {
           return ector.addEntry('Sentence.', cns);
         });
 
-        it('should activate the sentence node', function() {
+        it('should activate the sentence node', () => {
           return cns.getActivationValue(5).then(value => {
-            expect(value).to.be.equal(100);
+            expect(value).toBe(100);
           });
         });
 
-        it('should activate the token node', function() {
+        it('should activate the token node', () => {
           return cns.getActivationValue(6).then(value => {
-            expect(value).to.be.equal(100);
+            expect(value).toBe(100);
           });
         });
       });
     });
   });
 
-  describe('Response', function() {
+  describe('Response', () => {
     // First time, only the same sentence is returned.
-    it('should generate a response similar to the stimulus', function() {
+    it('should generate a response similar to the stimulus', () => {
       var ector = Ector('ECTOR', 'Guy');
       return ector.addEntry('Hello ECTOR.').then(nodes => {
         var response = ector.generateResponse();
-        expect(response).to.eql({ sentence: 'Hello Guy.', nodes: [2, 3] });
+        expect(response).toEqual({ sentence: 'Hello Guy.', nodes: [2, 3] });
       });
     });
 
-    it('should replace both names', function() {
+    it('should replace both names', () => {
       var ector = Ector('ECTOR', 'Guy');
       return ector.addEntry('Hello ECTOR and ECTOR.').then(nodes => {
         var response = ector.generateResponse();
-        expect(response.sentence).to.be.equal('Hello Guy and Guy.');
+        expect(response.sentence).toBe('Hello Guy and Guy.');
       });
     });
   });
 
-  describe('PreviousSentenceNodeId', function() {
-    it('should store the last sentence node id', function() {
+  describe('PreviousSentenceNodeId', () => {
+    it('should store the last sentence node id', () => {
       var ector = Ector('ECTOR', 'Guy');
-      expect(ector.lastSentenceNodeId).to.null;
+      expect(ector.lastSentenceNodeId).toBeNull();
       return ector.addEntry('Hello ECTOR.').then(nodes => {
-        expect(ector.lastSentenceNodeId).to.be.equal(1);
+        expect(ector.lastSentenceNodeId).toEqual(1);
       });
     });
 
-    describe('link nodes to lastSentenceNode', function() {
-      it('should not create links when no lastSentenceNode exist', function() {
+    describe('link nodes to lastSentenceNode', () => {
+      it('should not create links when no lastSentenceNode exist', () => {
         var ector = Ector('ECTOR', 'Guy');
         return ector.addEntry('Hello.').then(nodes => {
           ector.lastSentenceNodeId = null;
           expect(() => {
             ector.linkNodesToLastSentence([2]);
-          }).to.throw(Error);
+          }).toThrow(Error);
         });
       });
 
-      it('should not create link when null is given', function() {
+      it('should not create link when null is given', () => {
         var ector = Ector('ECTOR', 'Guy');
         return ector.addEntry('Hello.').then(nodes => {
           ector.linkNodesToLastSentence(null);
-          expect(ector.cn.link['2_']).to.be.undefined;
+          expect(ector.cn.link['2_']).toBeUndefined();
         });
       });
 
-      it('should not create link when [] is given', function() {
+      it('should not create link when [] is given', () => {
         var ector = Ector('ECTOR', 'Guy');
         return ector.addEntry('Hello.').then(nodes => {
           ector.linkNodesToLastSentence([]);
-          expect(ector.cn.link['2_']).to.be.undefined;
+          expect(ector.cn.link['2_']).toBeUndefined();
         });
       });
 
-      it('should create links', function() {
+      it('should create links', () => {
         var ector = Ector('ECTOR', 'Guy');
         return ector.addEntry('Hello.').then(nodes => {
           // 1 link from sentenceNode to the only tokenNode
           // sHello. (1) -> wHello. (2)
-          expect(ector.cn.link['2_1']).to.be.undefined;
+          expect(ector.cn.link['2_1']).toBeUndefined();
           ector.linkNodesToLastSentence([2]);
-          expect(ector.cn.link['2_1']).to.be.an('object');
+          expect(ector.cn.link['2_1']).toBeInstanceOf(Object);
         });
       });
     });
   });
 });
 
-// ### Injector
-describe('Injector', function() {
+describe('Injector', () => {
   // Define a Fake derived ConceptNetwork
-  const StrangeConceptNetwork = function() {
+  const StrangeConceptNetwork = () => {
     const cn = ConceptNetwork();
-    cn.strange = function() {
+    cn.strange = () => {
       return 'Did you say strange?';
     };
     return cn;
   };
   let ector = null;
 
-  before(function() {
+  beforeAll(() => {
     ector = Ector('ECTOR', 'Guy');
   });
 
-  it('should accept another ConceptNetwork', function() {
+  it('should accept another ConceptNetwork', () => {
     ector.ConceptNetwork = StrangeConceptNetwork;
-    expect(ector.cn).to.have.property('node');
-    expect(ector.cn).to.have.property('strange');
-    expect(ector.cn.strange()).to.be.equal('Did you say strange?');
+    expect(ector.cn).toHaveProperty('node');
+    expect(ector.cn).toHaveProperty('strange');
+    expect(ector.cn.strange()).toBe('Did you say strange?');
   });
 
-  it('should not accept another class for ConceptNetwork', function() {
-    expect(function() {
+  it('should not accept another class for ConceptNetwork', () => {
+    expect(() => {
       ector.ConceptNetwork = ConceptNetworkState;
-    }).to.throw(Error);
+    }).toThrow(Error);
   });
 
-  it('should work as a normal ConceptNetwork', function() {
+  it('should work as a normal ConceptNetwork', () => {
     ector.ConceptNetwork = StrangeConceptNetwork;
     return ector.addEntry('Hello ECTOR.').then(nodes => {
       var res = ector.generateResponse();
-      expect(res.sentence).to.be.equal('Hello Guy.');
+      expect(res.sentence).toBe('Hello Guy.');
     });
   });
 
-  it('should have its supplemental methods', function() {
+  it('should have its supplemental methods', () => {
     ector.ConceptNetwork = StrangeConceptNetwork;
-    assert.equal(typeof ector.cns.Guy.cn.strange, 'function');
+    expect(ector.cns.Guy.cn.strange).toBeInstanceOf(Function);
   });
 });
