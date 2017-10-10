@@ -26,106 +26,94 @@ export function ConceptNetworkState(conceptNetwork) {
       return id;
     },
 
-    activate(node) {
-      return new Promise((resolve, reject) => {
-        const id = this.getNodeId(node);
-        if (id instanceof Error) return reject(id);
-        if (this.state[id] === undefined) {
-          this.state[id] = {
-            activationValue: 100,
-            age: 0,
-            oldActivationValue: 0
+    async activate(node) {
+      const id = this.getNodeId(node);
+      if (id instanceof Error) return id;
+      if (this.state[id] === undefined) {
+        this.state[id] = {
+          activationValue: 100,
+          age: 0,
+          oldActivationValue: 0
+        };
+      } else {
+        this.state[id] = { activationValue: 100 };
+      }
+      return this.state[id];
+    },
+
+    async getActivationValue(node) {
+      const id = this.getNodeId(node);
+      if (id instanceof Error) return id;
+      let activationValue = 0;
+      if (!this.state[id]) {
+        activationValue = 0;
+      } else {
+        activationValue = this.state[id].activationValue;
+      }
+      return activationValue;
+    },
+
+    async getOldActivationValue(node) {
+      const id = this.getNodeId(node);
+      if (id instanceof Error) return id;
+      let oldActivationValue = 0;
+      if (!this.state[id]) {
+        oldActivationValue = 0;
+      } else {
+        oldActivationValue = this.state[id].oldActivationValue;
+      }
+      return oldActivationValue;
+    },
+
+    async getMaximumActivationValue(filter) {
+      const avArray = this.state
+        .filter((state, id) => {
+          if (filter) return this.cn.node[id].type === filter;
+          else return true;
+        })
+        .map(state => state.activationValue);
+      const max = Math.max(...avArray, 0);
+      return max;
+    },
+
+    async getActivatedTypedNodes(filter = '', threshold = 90) {
+      const activatedTypedNodes = this.state
+        .map((state, id) => {
+          return {
+            node: this.cn.node[id],
+            activationValue: this.state[id].activationValue
           };
-        } else {
-          this.state[id] = { activationValue: 100 };
-        }
-        resolve(this.state[id]);
-      });
+        })
+        .filter(e => {
+          if (filter) return e.node.type === filter;
+          else return true;
+        })
+        .filter(e => e.activationValue >= threshold);
+      return activatedTypedNodes;
     },
 
-    getActivationValue(node) {
-      return new Promise((resolve, reject) => {
-        const id = this.getNodeId(node);
-        if (id instanceof Error) return reject(id);
-        let activationValue = 0;
-        if (!this.state[id]) {
-          activationValue = 0;
-        } else {
-          activationValue = this.state[id].activationValue;
-        }
-        resolve(activationValue);
-      });
-    },
-
-    getOldActivationValue(node) {
-      return new Promise((resolve, reject) => {
-        const id = this.getNodeId(node);
-        if (id instanceof Error) return reject(id);
-        let oldActivationValue = 0;
-        if (!this.state[id]) {
-          oldActivationValue = 0;
-        } else {
-          oldActivationValue = this.state[id].oldActivationValue;
-        }
-        resolve(oldActivationValue);
-      });
-    },
-
-    getMaximumActivationValue(filter) {
-      return new Promise((resolve, reject) => {
-        const avArray = this.state
-          .filter((state, id) => {
-            if (filter) return this.cn.node[id].type === filter;
-            else return true;
-          })
-          .map(state => state.activationValue);
-        const max = Math.max(...avArray, 0);
-        resolve(max);
-      });
-    },
-
-    getActivatedTypedNodes(filter = '', threshold = 90) {
-      return new Promise((resolve, reject) => {
-        const activatedTypedNodes = this.state
-          .map((state, id) => {
-            return {
-              node: this.cn.node[id],
-              activationValue: this.state[id].activationValue
-            };
-          })
-          .filter(e => {
-            if (filter) return e.node.type === filter;
-            else return true;
-          })
-          .filter(e => e.activationValue >= threshold);
-        resolve(activatedTypedNodes);
-      });
-    },
-
-    setActivationValue(node, value) {
-      return new Promise((resolve, reject) => {
-        const id = this.getNodeId(node);
-        if (id instanceof Error) return reject(id);
-        if (!this.state[id]) {
-          this.state[id] = {
-            activationValue: value,
-            age: 0,
-            oldActivationValue: 0
-          };
-        } else {
-          this.state[id].activationValue = value;
-        }
-        // Reactivate non-activated nodes.
-        if (!value) {
-          delete this.state[id];
-        }
-        resolve(this.state[id]);
-      });
+    async setActivationValue(node, value) {
+      const id = this.getNodeId(node);
+      if (id instanceof Error) return id;
+      if (!this.state[id]) {
+        this.state[id] = {
+          activationValue: value,
+          age: 0,
+          oldActivationValue: 0
+        };
+      } else {
+        this.state[id].activationValue = value;
+      }
+      // Reactivate non-activated nodes.
+      if (!value) {
+        delete this.state[id];
+      }
+      return this.state[id];
     },
 
     normalNumberComingLinks: 2,
 
-    computeInfluence() {
+    oldComputeInfluence() {
       // What a mess!! Maybe read http://exploringjs.com/es6/ch_promises.html
       // See also https://pouchdb.com/2015/05/18/we-have-a-problem-with-promises.html
       debug('computeInfluence');
@@ -218,61 +206,78 @@ export function ConceptNetworkState(conceptNetwork) {
       });
     },
 
-    propagate(options = { decay: 40, memoryPerf: 100 }) {
-      return new Promise((resolve, reject) => {
-        if (options && typeof options !== 'object') {
-          return reject(new Error('propagate() parameter should be an object'));
+    async computeInfluence() {
+      const influenceNb = []; // nodeId -> number of influences
+      const influenceValue = []; // nodeId -> total of influences
+      await Promise.all(
+        this.cn.node.map(async node => {
+          const oldActivationValue = await this.getOldActivationValue(node);
+          const outgoingLinks = await this.cn.getNodeFromLinks(node.id);
+          const influencesTo = await Promise.all(
+            outgoingLinks.map(async linkId => {
+              const link = await this.cn.getLink(linkId);
+              return {
+                value: 0.5 + oldActivationValue * link.coOcc,
+                toId: link.toId
+              };
+            })
+          );
+          influencesTo.map(influence => {
+            influenceValue[influence.toId] = (influenceValue[influence.toId] || 0) + influence.value;
+            influenceNb[influence.toId] = (influenceNb[influence.toId] || 0) + 1;
+            return influence.toId;
+          });
+        })
+      );
+      return { influenceNb, influenceValue };
+    },
+
+    async propagate(options = { decay: 40, memoryPerf: 100 }) {
+      if (options && typeof options !== 'object') {
+        return new Error('propagate() parameter should be an object');
+      }
+
+      // Aging
+      this.state = this.state.map(state => {
+        state.oldActivationValue = state.activationValue;
+        state.age++;
+        return state;
+      });
+
+      const { influenceNb, influenceValue } = await this.computeInfluence();
+      this.cn.node.forEach((node, id) => {
+        let state = this.state[id];
+        if (state === undefined) {
+          state = { activationValue: 0, oldActivationValue: 0, age: 0 };
         }
+        const decay = options.decay || 40;
+        const memoryPerf = options.memoryPerf || 100;
+        const minusAge = 200 / (1 + Math.exp(-state.age / memoryPerf)) - 100;
+        let newActivationValue;
 
-        // Aging
-        this.state = this.state.map(state => {
-          state.oldActivationValue = state.activationValue;
-          state.age++;
-          return state;
-        });
-
-        this.computeInfluence()
-          .then(({ influenceNb, influenceValue }) => {
-            debug('influenceNb 2', influenceNb);
-            debug('influenceValue 2', influenceValue);
-            this.cn.node.forEach((node, id) => {
-              let state = this.state[id];
-              if (state === undefined) {
-                state = { activationValue: 0, oldActivationValue: 0, age: 0 };
-              }
-              const decay = options.decay || 40;
-              const memoryPerf = options.memoryPerf || 100;
-              const minusAge =
-                200 / (1 + Math.exp(-state.age / memoryPerf)) - 100;
-              let newActivationValue;
-
-              if (!influenceValue[id]) {
-                // If this node is not influenced at all
-                newActivationValue =
-                  state.oldActivationValue -
-                  decay * state.oldActivationValue / 100 -
-                  minusAge;
-              } else {
-                // If this node receives influence
-                let influence = influenceValue[id];
-                const nbIncomings = influenceNb[id];
-                influence /=
-                  Math.log(this.normalNumberComingLinks + nbIncomings) /
-                  Math.log(this.normalNumberComingLinks);
-                newActivationValue =
-                  state.oldActivationValue -
-                  decay * state.oldActivationValue / 100 +
-                  influence -
-                  minusAge;
-              }
-              newActivationValue = Math.max(newActivationValue, 0);
-              newActivationValue = Math.min(newActivationValue, 100);
-              this.setActivationValue(id, newActivationValue);
-            });
-            return resolve();
-          })
-          .catch(err => reject(err));
-      }); // Promise
+        if (!influenceValue[id]) {
+          // If this node is not influenced at all
+          newActivationValue =
+            state.oldActivationValue -
+            decay * state.oldActivationValue / 100 -
+            minusAge;
+        } else {
+          // If this node receives influence
+          let influence = influenceValue[id];
+          const nbIncomings = influenceNb[id];
+          influence /=
+            Math.log(this.normalNumberComingLinks + nbIncomings) /
+            Math.log(this.normalNumberComingLinks);
+          newActivationValue =
+            state.oldActivationValue -
+            decay * state.oldActivationValue / 100 +
+            influence -
+            minusAge;
+        }
+        newActivationValue = Math.max(newActivationValue, 0);
+        newActivationValue = Math.min(newActivationValue, 100);
+        this.setActivationValue(id, newActivationValue);
+      });
     } // propagate
   };
 
