@@ -248,7 +248,8 @@ describe('ConceptNetworkState', () => {
       expect(newValue).toBeLessThan(100);
     });
 
-    it('should activate node 2', async () => {
+    it.only('should activate node 2', async () => {
+      await cns.propagate();
       const value = await cns.getActivationValue(node2.id);
       expect(value).toBeGreaterThan(0);
     });
