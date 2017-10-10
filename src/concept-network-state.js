@@ -223,8 +223,10 @@ export function ConceptNetworkState(conceptNetwork) {
             })
           );
           influencesTo.map(influence => {
-            influenceValue[influence.toId] = (influenceValue[influence.toId] || 0) + influence.value;
-            influenceNb[influence.toId] = (influenceNb[influence.toId] || 0) + 1;
+            influenceValue[influence.toId] =
+              (influenceValue[influence.toId] || 0) + influence.value;
+            influenceNb[influence.toId] =
+              (influenceNb[influence.toId] || 0) + 1;
             return influence.toId;
           });
         })
