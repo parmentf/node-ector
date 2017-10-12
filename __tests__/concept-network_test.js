@@ -153,7 +153,7 @@ describe('ConceptNetwork', () => {
 
   describe('addLink', () => {
     beforeAll(async () => {
-      cn = new ConceptNetwork();
+      cn = ConceptNetwork();
       await cn.addNode({ label: 'Node 1' });
       await cn.addNode({ label: 'Node 2' });
       await cn.addNode({ label: 'Node 3' });
