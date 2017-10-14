@@ -141,22 +141,24 @@ describe('Bot', () => {
       });
 
       it('should return an error when entry is not a string', done => {
-        var ector = Ector();
+        const ector = Ector();
         ector.addEntry().catch(() => {
           done();
         });
       });
 
       it('should create a sentence node', async () => {
-        var ector = Ector();
+        const ector = Ector();
         const nodes = await ector.addEntry('Hello.');
+        debug('1, nodes', nodes);
         expect(ector.cn.node[1].label).toBe('Hello.');
         expect(ector.cn.node[1].type).toBe('s');
       });
 
       it('should return an array of one word node', async () => {
-        var ector = Ector();
+        const ector = Ector();
         const nodes = await ector.addEntry('Hello.');
+        debug('nodes', nodes);
         expect(nodes).not.toBeInstanceOf(Error);
         expect(nodes).toHaveLength(1);
         expect(nodes[0].label).toBe('Hello.');
@@ -404,7 +406,7 @@ describe('Injector', () => {
   it('should not accept another class for ConceptNetwork', () => {
     expect(() => {
       ector.ConceptNetwork = ConceptNetworkState;
-    }).toThrow(Error);
+    }).toThrow();
   });
 
   it('should work as a normal ConceptNetwork', async () => {
