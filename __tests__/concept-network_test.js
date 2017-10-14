@@ -76,6 +76,15 @@ describe('ConceptNetwork', () => {
       expect(node.id).toBe(3);
       expect(node.occ).toBe(1);
     });
+
+    it('should add a typed node', async () => {
+      const node = await cn.addNode({
+        label: 'typed node',
+        type: 't'
+      });
+      expect(node.id).toBe(4);
+      expect(node).toHaveProperty('type');
+    });
   });
 
   describe('decrementNode', () => {
@@ -119,6 +128,18 @@ describe('ConceptNetwork', () => {
       expect(nodes[1]).toHaveProperty('label');
       expect(nodes[1]).toHaveProperty('id');
       expect(nodes[1].id).toBe(1);
+    });
+
+    it('should add one typed node', async () => {
+      const nodes = await cn.addNodes([
+        {
+          label: 'typed node',
+          type: 't'
+        }
+      ]);
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0]).toHaveProperty('label');
+      expect(nodes[0]).toHaveProperty('type');
     });
   });
 
